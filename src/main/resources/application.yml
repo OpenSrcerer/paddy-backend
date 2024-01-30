@@ -1,2 +1,8 @@
-greeting:
-  message: "hello"
+quarkus:
+  package:
+    output-name: paddy-backend
+  devservices:
+    enabled: false
+
+mqtt:
+  subscriptions: device-writes/#

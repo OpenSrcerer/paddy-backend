@@ -9,29 +9,36 @@ repositories {
     mavenLocal()
 }
 
+group = "online.danielstefani.paddy"
+version = "0.0.1-SNAPSHOT"
+
 val quarkusPlatformGroupId: String by project
 val quarkusPlatformArtifactId: String by project
 val quarkusPlatformVersion: String by project
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
-    implementation("io.quarkus:quarkus-hibernate-orm")
-    implementation("io.quarkus:quarkus-smallrye-reactive-messaging-amqp")
-    implementation("io.quarkus:quarkus-smallrye-reactive-messaging-mqtt")
-    implementation("io.quarkus:quarkus-smallrye-reactive-messaging-rabbitmq")
-    implementation("io.quarkus:quarkus-kotlin")
+    implementation(enforcedPlatform("${quarkusPlatformGroupId}:quarkus-camel-bom:${quarkusPlatformVersion}"))
+
+//    implementation("io.quarkus:quarkus-hibernate-orm")
+//    implementation("io.quarkus:quarkus-hibernate-orm-panache")
+
+//    implementation("io.quarkus:quarkus-smallrye-reactive-messaging-mqtt")
+    implementation("com.hivemq:hivemq-mqtt-client-reactor:1.3.3")
+//    implementation("org.apache.camel.quarkus:camel-quarkus-paho-mqtt5")
+
     implementation("io.quarkus:quarkus-config-yaml")
-    implementation("io.quarkus:quarkus-hibernate-orm-panache")
     implementation("io.quarkus:quarkus-jackson")
-    implementation("io.quarkus:quarkus-reactive-pg-client")
-    implementation("io.quarkus:quarkus-jdbc-postgresql")
+
+//    implementation("io.quarkus:quarkus-reactive-pg-client")
+//    implementation("io.quarkus:quarkus-jdbc-postgresql")'
+    implementation("io.quarkus:quarkus-kotlin")
+
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
+
     testImplementation("io.quarkus:quarkus-junit5")
 }
-
-group = "online.danielstefani"
-version = "0.0.1-SNAPSHOT"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -41,6 +48,7 @@ java {
 tasks.withType<Test> {
     systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")
 }
+
 allOpen {
     annotation("jakarta.ws.rs.Path")
     annotation("jakarta.enterprise.context.ApplicationScoped")

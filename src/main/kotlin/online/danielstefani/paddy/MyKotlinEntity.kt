@@ -1,8 +1,8 @@
-package online.danielstefani
+package online.danielstefani.paddy
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
+//import jakarta.persistence.Entity
+//import jakarta.persistence.GeneratedValue
+//import jakarta.persistence.Id
 
 /**
  * Example JPA entity.
@@ -22,10 +22,10 @@ import jakarta.persistence.Id
  *     }
  * }
  */
-@Entity
-class MyKotlinEntity {
-    @get:GeneratedValue
-    @get:Id
-    var id: Long? = null
-    var field: String? = null
-}
+//@Entity
+//class MyKotlinEntity {
+//    @get:GeneratedValue
+//    @get:Id
+//    var id: Long? = null
+//    var field: String? = null
+//}

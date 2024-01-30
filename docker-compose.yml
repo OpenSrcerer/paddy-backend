@@ -1,0 +1,64 @@
+# FOR DEVELOPMENT PURPOSES ONLY. DO NOT USE IN PRODUCTION
+
+version: "3.8"
+
+networks:
+  paddy-bridge:
+    driver: bridge
+
+services:
+  paddy-backend:
+    container_name: paddy-backend
+    networks:
+      paddy-bridge:
+        aliases:
+          - paddy.backend.io
+    build:
+      context: .
+      dockerfile: Dockerfile.jvm
+    env_file:
+      - .env
+
+  emqx1:
+    image: emqx:5.4.1
+    container_name: emqx1
+    environment:
+      - "EMQX_NODE_NAME=emqx@node1.emqx.io"
+      - "EMQX_CLUSTER__DISCOVERY_STRATEGY=static"
+      - "EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.io,emqx@node2.emqx.io]"
+    healthcheck:
+      test: [ "CMD", "/opt/emqx/bin/emqx", "ctl", "status" ]
+      interval: 5s
+      timeout: 25s
+      retries: 5
+    networks:
+      paddy-bridge:
+        aliases:
+          - node1.emqx.io
+    ports:
+      - 1883:1883
+      - 8083:8083
+      - 8084:8084
+      - 8883:8883
+      - 18083:18083
+    # volumes:
+    #   - $PWD/emqx1_data:/opt/emqx/data
+
+    # emqx2:
+    #   image: emqx:5.4.1
+    #   container_name: emqx2
+    #   environment:
+    #   - "EMQX_NODE_NAME=emqx@node2.emqx.io"
+    #   - "EMQX_CLUSTER__DISCOVERY_STRATEGY=static"
+    #   - "EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.io,emqx@node2.emqx.io]"
+    #   healthcheck:
+    #     test: ["CMD", "/opt/emqx/bin/emqx", "ctl", "status"]
+    #     interval: 5s
+    #     timeout: 25s
+    #     retries: 5
+    #   networks:
+    #     emqx-bridge:
+    #       aliases:
+    #       - node2.emqx.io
+    # volumes:
+    #   - $PWD/emqx2_data:/opt/emqx/data

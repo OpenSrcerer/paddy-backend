@@ -5,6 +5,3 @@ quarkus:
     enabled: false
   http:
     port: 1337
-
-mqtt:
-  subscriptions: device-writes/#

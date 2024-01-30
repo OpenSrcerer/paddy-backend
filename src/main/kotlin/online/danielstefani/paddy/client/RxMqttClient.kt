@@ -74,7 +74,7 @@ class RxMqttClient(
      */
     private fun Mqtt5RxClient.connectScenario(): Mqtt5RxClient {
         this.connectWith()
-            .noSessionExpiry()
+            .sessionExpiryInterval(1800)
             .cleanStart(true)
             .applyConnect()
             .doOnSuccess { Log.info("[client->mqtt] // " +

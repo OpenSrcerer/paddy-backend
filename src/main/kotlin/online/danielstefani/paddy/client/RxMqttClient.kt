@@ -13,6 +13,8 @@ import io.reactivex.Flowable
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import online.danielstefani.paddy.controllers.MqttController
+import reactor.core.publisher.Mono
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -28,6 +30,7 @@ class RxMqttClient(
 
     // Singleton
     private var mqttClient: Mqtt5RxClient? = null
+    private val mqttClientId = UUID.randomUUID()
 
     /**
      * Rebuilds (replaces) current singleton client.
@@ -38,7 +41,7 @@ class RxMqttClient(
         // ---- Build Client ----
         val client = Mqtt5Client.builder()
             .identifier(
-                "${mqttConfig.clientId()}-${UUID.randomUUID()}".apply {
+                "${mqttConfig.clientId()}-$mqttClientId".apply {
                     Log.info("[client->mqtt->reaper] // Building new MQTT client: $this")
                 }
             )
@@ -74,7 +77,6 @@ class RxMqttClient(
      */
     private fun Mqtt5RxClient.connectScenario(): Mqtt5RxClient {
         this.connectWith()
-            .sessionExpiryInterval(1800)
             .cleanStart(true)
             .applyConnect()
             .doOnSuccess { Log.info("[client->mqtt] // " +
@@ -116,7 +118,13 @@ class RxMqttClient(
                 Log.info("[client->mqtt] // " + "Subscribing to topics [" +
                         "${mqttConfig.getSubscriptions().joinToString(", ") { "'${it}'" }}]")
             }
-            .subscribe()
+            .subscribe(
+                { },
+                {
+                    Log.error("[client->mqtt] // Session got kicked out", it)
+                    Mono.delay(Duration.ofSeconds(1))
+                        .subscribe { rebuildMqttClient() }
+                })
     }
 
     private fun shutdownClient(): Completable {

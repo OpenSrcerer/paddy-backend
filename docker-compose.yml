@@ -16,6 +16,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.jvm
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1337/health"]
+      interval: 5s
+      timeout: 30s
+      retries: 3
+      start_period: 10s
+    ports:
+      - "1337:1337"
     env_file:
       - .env
 
@@ -36,11 +44,11 @@ services:
         aliases:
           - node1.emqx.io
     ports:
-      - 1883:1883
-      - 8083:8083
-      - 8084:8084
-      - 8883:8883
-      - 18083:18083
+      - "1883:1883"
+      - "8083:8083"
+      - "8084:8084"
+      - "8883:8883"
+      - "18083:18083"
     # volumes:
     #   - $PWD/emqx1_data:/opt/emqx/data
 

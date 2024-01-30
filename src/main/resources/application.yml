@@ -3,6 +3,8 @@ quarkus:
     output-name: paddy-backend
   devservices:
     enabled: false
+  http:
+    port: 1337
 
 mqtt:
   subscriptions: device-writes/#

@@ -18,7 +18,6 @@ val quarkusPlatformVersion: String by project
 
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
-    implementation(enforcedPlatform("${quarkusPlatformGroupId}:quarkus-camel-bom:${quarkusPlatformVersion}"))
 
 //    implementation("io.quarkus:quarkus-hibernate-orm")
 //    implementation("io.quarkus:quarkus-hibernate-orm-panache")
@@ -29,6 +28,7 @@ dependencies {
 
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-jackson")
+    implementation("io.quarkus:quarkus-resteasy-reactive")
 
 //    implementation("io.quarkus:quarkus-reactive-pg-client")
 //    implementation("io.quarkus:quarkus-jdbc-postgresql")'

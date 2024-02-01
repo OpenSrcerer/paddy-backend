@@ -13,9 +13,7 @@ services:
       paddy-bridge:
         aliases:
           - paddy.backend.io
-    build:
-      context: .
-      dockerfile: Dockerfile.jvm
+    build: .
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:1337/health"]
       interval: 5s

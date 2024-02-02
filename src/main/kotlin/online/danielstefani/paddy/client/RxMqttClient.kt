@@ -5,6 +5,8 @@ import com.hivemq.client.mqtt.mqtt5.Mqtt5Client
 import com.hivemq.client.mqtt.mqtt5.Mqtt5RxClient
 import com.hivemq.client.mqtt.mqtt5.advanced.Mqtt5ClientAdvancedConfig
 import com.hivemq.client.mqtt.mqtt5.message.auth.Mqtt5SimpleAuth
+import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
+import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult
 import com.hivemq.client.mqtt.mqtt5.message.subscribe.Mqtt5Subscription
 import io.quarkus.logging.Log
 import io.quarkus.runtime.StartupEvent
@@ -31,6 +33,16 @@ class RxMqttClient(
     // Singleton
     private var mqttClient: Mqtt5RxClient? = null
     private val mqttClientId = UUID.randomUUID()
+
+    fun publish(topic: String, message: String): Flowable<Mqtt5PublishResult> {
+        return mqttClient!!.publish(
+            Flowable.just(Mqtt5Publish.builder()
+                .topic(topic)
+                .qos(MqttQos.AT_MOST_ONCE)
+                .payload(message.toByteArray())
+                .build()))
+            .doOnComplete { Log.info("Successfully published $message to $topic!") }
+    }
 
     /**
      * Rebuilds (replaces) current singleton client.
@@ -87,7 +99,7 @@ class RxMqttClient(
                     "Connecting to... ${mqttConfig.host()}:${mqttConfig.port()}")
             }
             .retryWhen {
-                Flowable.timer(30, TimeUnit.SECONDS)
+                Flowable.timer(5, TimeUnit.SECONDS)
                     .doOnNext { Log.info("[client->mqtt] // " +
                             "Retrying connection to ${mqttConfig.host()}:${mqttConfig.port()}...") }
             }

@@ -29,6 +29,7 @@ dependencies {
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-jackson")
     implementation("io.quarkus:quarkus-resteasy-reactive")
+    implementation("io.quarkus:quarkus-scheduler")
 
 //    implementation("io.quarkus:quarkus-reactive-pg-client")
 //    implementation("io.quarkus:quarkus-jdbc-postgresql")'

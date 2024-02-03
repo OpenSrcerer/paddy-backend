@@ -34,14 +34,14 @@ class RxMqttClient(
     private var mqttClient: Mqtt5RxClient? = null
     private val mqttClientId = UUID.randomUUID()
 
-    fun publish(topic: String, message: String): Flowable<Mqtt5PublishResult> {
-        return mqttClient!!.publish(
+    fun publish(topic: String, message: String): Flowable<Mqtt5PublishResult>? {
+        return mqttClient?.publish(
             Flowable.just(Mqtt5Publish.builder()
                 .topic(topic)
                 .qos(MqttQos.AT_MOST_ONCE)
                 .payload(message.toByteArray())
                 .build()))
-            .doOnComplete { Log.info("Successfully published $message to $topic!") }
+            ?.doOnComplete { Log.info("Successfully published $message to $topic!") }
     }
 
     /**

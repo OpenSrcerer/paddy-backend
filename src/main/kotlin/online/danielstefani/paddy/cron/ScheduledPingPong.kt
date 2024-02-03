@@ -12,6 +12,6 @@ class ScheduledPingPong(
     @Scheduled(every = "30s")
     fun pingDevicesPeriodically() {
         rxMqttClient.publish("device-multicast", "{\"message\":\"Ping!\"}")
-            .subscribe()
+            ?.subscribe()
     }
 }

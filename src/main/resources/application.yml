@@ -4,4 +4,4 @@ quarkus:
   devservices:
     enabled: false
   http:
-    port: 80
+    port: 443

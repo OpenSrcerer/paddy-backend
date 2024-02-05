@@ -5,3 +5,6 @@ quarkus:
     enabled: false
   http:
     port: 80
+    root-path: /api/v1
+    access-log:
+      enabled: true

@@ -15,19 +15,25 @@ import io.reactivex.Flowable
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import online.danielstefani.paddy.controllers.MqttController
+import online.danielstefani.paddy.security.JwtService
 import reactor.core.publisher.Mono
 import java.time.Duration
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 @ApplicationScoped
 class RxMqttClient(
     private val mqttConfig: MqttConfiguration,
-    private val mqttController: MqttController
+    private val mqttController: MqttController,
+    private val jwtService: JwtService
 ) {
     // Build the client on startup
     fun startup(@Observes event: StartupEvent) {
-        rebuildMqttClient()
+        Mono.delay(Duration.of(mqttConfig.mqttClientGracePeriod(), ChronoUnit.SECONDS))
+            .doOnSubscribe { Log.info("[client->mqtt] Building in ${mqttConfig.mqttClientGracePeriod()}...") }
+            .doOnError { Log.error("[client->mqtt] Failed to connect to broker!", it) }
+            .subscribe { rebuildMqttClient() }
     }
 
     // Singleton
@@ -41,7 +47,7 @@ class RxMqttClient(
                 .qos(MqttQos.AT_MOST_ONCE)
                 .payload(message.toByteArray())
                 .build()))
-            ?.doOnComplete { Log.info("Successfully published $message to $topic!") }
+            ?.doOnComplete { Log.info("[client->mqtt] Successfully published $message to $topic!") }
     }
 
     /**
@@ -60,14 +66,11 @@ class RxMqttClient(
             .serverHost(mqttConfig.host())
             .serverPort(mqttConfig.port())
             .also {
-                if (mqttConfig.username().isNotBlank() && mqttConfig.password().isNotBlank()) {
-                    it.simpleAuth(
-                        Mqtt5SimpleAuth.builder()
-                            .username(mqttConfig.username())
-                            .password(mqttConfig.password().toByteArray(Charsets.UTF_8))
-                            .build()
-                    )
-                }
+                it.simpleAuth(
+                    Mqtt5SimpleAuth.builder()
+                        .password(jwtService.makeJwt().toByteArray(Charsets.UTF_8))
+                        .build()
+                )
             }
             .advancedConfig(
                 Mqtt5ClientAdvancedConfig.builder()

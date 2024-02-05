@@ -6,12 +6,6 @@ import io.smallrye.config.WithDefault
 @ConfigMapping(prefix = "mqtt")
 interface MqttConfiguration {
 
-    @WithDefault(" ")
-    fun username(): String
-
-    @WithDefault(" ")
-    fun password(): String
-
     @WithDefault("localhost")
     fun host(): String
 
@@ -20,6 +14,13 @@ interface MqttConfiguration {
 
     @WithDefault("paddy-backend")
     fun clientId(): String
+
+    // ---- Meta ---
+
+    @WithDefault("5")
+    fun mqttClientGracePeriod(): Long
+
+    fun authenticationKey(): String
 
     fun subscriptions(): String
 

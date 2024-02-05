@@ -30,8 +30,8 @@ class RxMqttClient(
 ) {
     // Build the client on startup
     fun startup(@Observes event: StartupEvent) {
-        Mono.delay(Duration.of(mqttConfig.mqttClientGracePeriod(), ChronoUnit.SECONDS))
-            .doOnSubscribe { Log.info("[client->mqtt] Building in ${mqttConfig.mqttClientGracePeriod()}...") }
+        Mono.delay(Duration.of(mqttConfig.clientGracePeriod(), ChronoUnit.SECONDS))
+            .doOnSubscribe { Log.info("[client->mqtt] Building in ${mqttConfig.clientGracePeriod()}...") }
             .doOnError { Log.error("[client->mqtt] Failed to connect to broker!", it) }
             .subscribe { rebuildMqttClient() }
     }

@@ -18,7 +18,7 @@ interface MqttConfiguration {
     // ---- Meta ---
 
     @WithDefault("5")
-    fun mqttClientGracePeriod(): Long
+    fun clientGracePeriod(): Long
 
     fun authenticationKey(): String
 

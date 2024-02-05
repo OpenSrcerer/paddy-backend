@@ -72,7 +72,7 @@ class JwtService(
         return jwksResponse
     }
 
-    fun makeJwt(jwtLifetimeHours: Long = 1): String {
+    fun makeJwt(): String {
         val privateKeyContent =
             mqttConfiguration.authenticationKey()
                 .replace("-----BEGIN PRIVATE KEY-----", "")
@@ -112,7 +112,7 @@ class JwtService(
             String.format(
                 jwtPayloadTemplate,
                 Instant.now().epochSecond,
-                Instant.now().plusSeconds(jwtLifetimeHours).epochSecond
+                Instant.now().plusSeconds(300).epochSecond
             ).replace(" ", "").replace("\n", "")
                 .toByteArray(StandardCharsets.UTF_8)
         )

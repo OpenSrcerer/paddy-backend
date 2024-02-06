@@ -17,11 +17,6 @@ interface MqttConfiguration {
 
     // ---- Meta ---
 
-    @WithDefault("5")
-    fun clientGracePeriod(): Long
-
-    fun authenticationKey(): String
-
     fun subscriptions(): String
 
     fun getSubscriptions(): List<String> {

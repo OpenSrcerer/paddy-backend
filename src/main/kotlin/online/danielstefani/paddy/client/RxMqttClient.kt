@@ -5,17 +5,22 @@ import com.hivemq.client.mqtt.mqtt5.Mqtt5Client
 import com.hivemq.client.mqtt.mqtt5.Mqtt5RxClient
 import com.hivemq.client.mqtt.mqtt5.advanced.Mqtt5ClientAdvancedConfig
 import com.hivemq.client.mqtt.mqtt5.message.auth.Mqtt5SimpleAuth
+import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAck
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult
 import com.hivemq.client.mqtt.mqtt5.message.subscribe.Mqtt5Subscription
 import io.quarkus.logging.Log
 import io.quarkus.runtime.StartupEvent
+import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Single
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import online.danielstefani.paddy.controllers.MqttController
 import org.eclipse.microprofile.rest.client.inject.RestClient
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.util.retry.Retry
 import java.time.Duration
@@ -94,40 +99,44 @@ class RxMqttClient(
             mqttClient = this
             mqttClient!!
                 .connectScenario()
-                .applySubscription()
+                .flatMap { mqttClient!!.applySubscription().toObservable() }
+                .`as` { Flux.from(it.toFlowable(BackpressureStrategy.BUFFER)) }
+                .retryWhen(
+                    Retry.fixedDelay(Long.MAX_VALUE, Duration.ofSeconds(5))
+                        .doBeforeRetry {
+                            Log.info("[client->mqtt] // " +
+                                    "Connecting to... ${mqttConfig.host()}:${mqttConfig.port()}")
+                        }
+                )
+                .subscribe()
         }
     }
 
     /**
      * Define connection rules for MQTT Client building above.
      */
-    private fun Mqtt5RxClient.connectScenario(): Mqtt5RxClient {
-        this.connectWith()
+    private fun Mqtt5RxClient.connectScenario(): Observable<Mqtt5ConnAck> {
+        return this.connectWith()
             .cleanStart(true)
             .applyConnect()
+            // Need to do this because RxJava's
+            // error handling mechanism is futile
+            // Project Reactor >>>>
+            .doOnSubscribe { Log.info("[client->mqtt] // " +
+                    "Connecting to... ${mqttConfig.host()}:${mqttConfig.port()}")
+            }
             .doOnSuccess { Log.info("[client->mqtt] // " +
                     "Connected to ${mqttConfig.host()}:${mqttConfig.port()}, ${it.reasonCode}") }
             .doOnError { Log.error("[client->mqtt] // " +
                     "Connection failed to ${mqttConfig.host()}:${mqttConfig.port()}, ${it.message}") }
-            .doOnSubscribe { Log.info("[client->mqtt] // " +
-                    "Connecting to... ${mqttConfig.host()}:${mqttConfig.port()}")
-            }
-            .retryWhen {
-                Flowable.timer(5, TimeUnit.SECONDS)
-                    .doOnNext { Log.info("[client->mqtt] // " +
-                            "Retrying connection to ${mqttConfig.host()}:${mqttConfig.port()}...") }
-            }
-            .ignoreElement()
-            .blockingAwait()
-
-        return mqttClient!!
+            .toObservable()
     }
 
     /**
      * Subscribe to the given topics.
      */
-    private fun Mqtt5RxClient.applySubscription() {
-        this.subscribePublishesWith()
+    private fun Mqtt5RxClient.applySubscription(): Flowable<Mqtt5Publish> {
+        return this.subscribePublishesWith()
             .addSubscriptions(
                 mqttConfig.getSubscriptions()
                     .map {
@@ -138,19 +147,16 @@ class RxMqttClient(
                     }
             )
             .applySubscribe()
-            .doOnError { mqttController.readError(it) }
-            .doOnNext { mqttController.readMessage(it) }
             .doOnSubscribe {
                 Log.info("[client->mqtt] // " + "Subscribing to topics [" +
                         "${mqttConfig.getSubscriptions().joinToString(", ") { "'${it}'" }}]")
             }
-            .subscribe(
-                { },
-                {
-                    Log.error("[client->mqtt] // Session got kicked out", it)
-                    Mono.delay(Duration.ofSeconds(1))
-                        .subscribe { rebuildMqttClient() }
-                })
+            .doOnNext { mqttController.readMessage(it) }
+            .doOnError { mqttController.readError(it) }
+            .doOnTerminate {
+                Log.info("[client->mqtt] // " +
+                        "Connection to ${mqttConfig.host()}:${mqttConfig.port()} ended.")
+            }
     }
 
     private fun shutdownClient(): Completable {

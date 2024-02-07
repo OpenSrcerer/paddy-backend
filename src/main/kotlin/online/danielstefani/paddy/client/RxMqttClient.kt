@@ -15,30 +15,41 @@ import io.reactivex.Flowable
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import online.danielstefani.paddy.controllers.MqttController
-import online.danielstefani.paddy.security.JwtService
+import org.eclipse.microprofile.rest.client.inject.RestClient
 import reactor.core.publisher.Mono
+import reactor.util.retry.Retry
 import java.time.Duration
-import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 @ApplicationScoped
 class RxMqttClient(
     private val mqttConfig: MqttConfiguration,
-    private val mqttController: MqttController,
-    private val jwtService: JwtService
+    private val mqttController: MqttController
 ) {
-    // Build the client on startup
-    fun startup(@Observes event: StartupEvent) {
-        Mono.delay(Duration.of(mqttConfig.clientGracePeriod(), ChronoUnit.SECONDS))
-            .doOnSubscribe { Log.info("[client->mqtt] Building in ${mqttConfig.clientGracePeriod()}...") }
-            .doOnError { Log.error("[client->mqtt] Failed to connect to broker!", it) }
-            .subscribe { rebuildMqttClient() }
-    }
+    @RestClient
+    private lateinit var jwtAuthClient: JwtAuthClient
 
     // Singleton
     private var mqttClient: Mqtt5RxClient? = null
     private val mqttClientId = UUID.randomUUID()
+
+    private var jwtUsername: String? = null
+
+    // Build the client on startup
+    fun startup(@Observes event: StartupEvent) {
+
+        // Try to get the auth token first
+        Mono.just(jwtAuthClient.getJwt())
+            .doOnSubscribe { Log.info("[client->mqtt] Retrieving JWT to connect to broker...") }
+            .doOnSuccess { Log.info("[client->mqtt] Got JWT <${it.slice(0..10)}...> connecting to broker!") }
+            .doOnError { Log.error("[client->mqtt] Failed to retrieve JWT!", it) }
+            .retryWhen(Retry.backoff(3, Duration.ofSeconds(5)))
+            .subscribe {
+                jwtUsername = it
+                rebuildMqttClient()
+            }
+    }
 
     fun publish(topic: String, message: String): Flowable<Mqtt5PublishResult>? {
         return mqttClient?.publish(
@@ -68,7 +79,7 @@ class RxMqttClient(
             .also {
                 it.simpleAuth(
                     Mqtt5SimpleAuth.builder()
-                        .password(jwtService.makeJwt().toByteArray(Charsets.UTF_8))
+                        .username(jwtUsername!!)
                         .build()
                 )
             }

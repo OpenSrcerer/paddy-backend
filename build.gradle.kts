@@ -26,6 +26,9 @@ dependencies {
     implementation("com.hivemq:hivemq-mqtt-client-reactor:1.3.3")
 //    implementation("org.apache.camel.quarkus:camel-quarkus-paho-mqtt5")
 
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
+    implementation("io.quarkus:quarkus-rest-client-reactive-jackson")
+
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-jackson")
     implementation("io.quarkus:quarkus-resteasy-reactive")

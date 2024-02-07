@@ -8,3 +8,6 @@ quarkus:
     root-path: /api/v1
     access-log:
       enabled: true
+  rest-client:
+    jwt:
+      http2: true

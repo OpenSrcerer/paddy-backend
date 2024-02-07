@@ -16,7 +16,6 @@ interface MqttConfiguration {
     fun clientId(): String
 
     // ---- Meta ---
-
     fun subscriptions(): String
 
     fun getSubscriptions(): List<String> {

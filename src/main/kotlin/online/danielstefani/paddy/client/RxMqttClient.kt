@@ -15,7 +15,6 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
-import io.reactivex.Single
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import online.danielstefani.paddy.controllers.MqttController
@@ -25,7 +24,6 @@ import reactor.core.publisher.Mono
 import reactor.util.retry.Retry
 import java.time.Duration
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 @ApplicationScoped
 class RxMqttClient(
@@ -99,6 +97,9 @@ class RxMqttClient(
             mqttClient = this
             mqttClient!!
                 .connectScenario()
+                // Need to do this because RxJava's
+                // error handling mechanism is futile
+                // Project Reactor >>>>
                 .flatMap { mqttClient!!.applySubscription().toObservable() }
                 .`as` { Flux.from(it.toFlowable(BackpressureStrategy.BUFFER)) }
                 .retryWhen(
@@ -119,9 +120,6 @@ class RxMqttClient(
         return this.connectWith()
             .cleanStart(true)
             .applyConnect()
-            // Need to do this because RxJava's
-            // error handling mechanism is futile
-            // Project Reactor >>>>
             .doOnSubscribe { Log.info("[client->mqtt] // " +
                     "Connecting to... ${mqttConfig.host()}:${mqttConfig.port()}")
             }

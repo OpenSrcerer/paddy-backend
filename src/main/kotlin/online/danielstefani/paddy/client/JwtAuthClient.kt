@@ -15,6 +15,6 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
 interface JwtAuthClient {
 
     @GET
-    @Path("/jwt")
+    @Path("/admin-jwt")
     fun getJwt(): String
 }

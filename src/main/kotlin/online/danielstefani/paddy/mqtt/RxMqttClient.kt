@@ -15,6 +15,7 @@ import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
+import io.reactivex.Single
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import online.danielstefani.paddy.controllers.MqttController
@@ -128,6 +129,14 @@ class RxMqttClient(
                     "Connected to ${mqttConfig.host()}:${mqttConfig.port()}, ${it.reasonCode}") }
             .doOnError { Log.error("[client->mqtt] // " +
                     "Connection failed to ${mqttConfig.host()}:${mqttConfig.port()}, ${it.message}") }
+            .onErrorResumeNext {
+                // if client is already connected, continue with a single that never
+                // emits to stop reconnections
+                if (mqttClient?.state?.isConnected == true)
+                    return@onErrorResumeNext Single.never<Mqtt5ConnAck>()
+
+                Single.error(it)
+            }
             .toObservable()
     }
 

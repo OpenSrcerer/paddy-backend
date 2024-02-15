@@ -1,4 +1,4 @@
-package online.danielstefani.paddy.controllers
+package online.danielstefani.paddy
 
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.Path

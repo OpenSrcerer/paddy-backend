@@ -19,29 +19,34 @@ val quarkusPlatformVersion: String by project
 dependencies {
     implementation(enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"))
 
-//    implementation("io.quarkus:quarkus-hibernate-orm")
-//    implementation("io.quarkus:quarkus-hibernate-orm-panache")
+    // Neo4j
+    implementation("org.neo4j:neo4j-ogm-quarkus:3.6.0")
+    implementation("io.quarkiverse.neo4j:quarkus-neo4j:3.6.0")
 
-//    implementation("io.quarkus:quarkus-smallrye-reactive-messaging-mqtt")
+    // Security
+    implementation("io.quarkus:quarkus-security")
+
+    // HiveMQ MQTT Client
     implementation("com.hivemq:hivemq-mqtt-client-reactor:1.3.3")
-//    implementation("org.apache.camel.quarkus:camel-quarkus-paho-mqtt5")
 
-    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
+    // Reactive REST
     implementation("io.quarkus:quarkus-rest-client-reactive-jackson")
+    implementation("io.quarkus:quarkus-resteasy-reactive-jackson")
+    implementation("io.quarkus:quarkus-resteasy-reactive")
 
+    // Quarkus Support
     implementation("io.quarkus:quarkus-config-yaml")
     implementation("io.quarkus:quarkus-jackson")
-    implementation("io.quarkus:quarkus-resteasy-reactive")
     implementation("io.quarkus:quarkus-scheduler")
-
-//    implementation("io.quarkus:quarkus-reactive-pg-client")
-//    implementation("io.quarkus:quarkus-jdbc-postgresql")'
-    implementation("io.quarkus:quarkus-kotlin")
-
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
 
+    // Kotlin-Specific
+    implementation("io.quarkus:quarkus-kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.2.2")
+
     testImplementation("io.quarkus:quarkus-junit5")
+    testImplementation("io.rest-assured:rest-assured")
 }
 
 java {

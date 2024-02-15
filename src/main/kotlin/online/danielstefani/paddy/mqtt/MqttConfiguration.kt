@@ -1,4 +1,4 @@
-package online.danielstefani.paddy.client
+package online.danielstefani.paddy.mqtt
 
 import io.smallrye.config.ConfigMapping
 import io.smallrye.config.WithDefault
@@ -15,7 +15,7 @@ interface MqttConfiguration {
     @WithDefault("paddy-backend")
     fun clientId(): String
 
-    // ---- Meta ---
+    // ---- Meta ----
     fun subscriptions(): String
 
     fun getSubscriptions(): List<String> {

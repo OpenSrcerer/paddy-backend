@@ -1,4 +1,4 @@
-package online.danielstefani.paddy.client
+package online.danielstefani.paddy.mqtt
 
 import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client
@@ -18,6 +18,7 @@ import io.reactivex.Observable
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import online.danielstefani.paddy.controllers.MqttController
+import online.danielstefani.paddy.security.JwtAuthClient
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -31,7 +32,7 @@ class RxMqttClient(
     private val mqttController: MqttController
 ) {
     @RestClient
-    private lateinit var jwtAuthClient: JwtAuthClient
+    private lateinit var paddyAuth: JwtAuthClient
 
     // Singleton
     private var mqttClient: Mqtt5RxClient? = null
@@ -43,7 +44,7 @@ class RxMqttClient(
     fun startup(@Observes event: StartupEvent) {
 
         // Try to get the auth token first
-        Mono.just(jwtAuthClient.getJwt())
+        Mono.just(paddyAuth.getAdminJwt())
             .doOnSubscribe { Log.info("[client->mqtt] Retrieving JWT to connect to broker...") }
             .doOnSuccess { Log.info("[client->mqtt] Got JWT <${it.slice(0..10)}...> connecting to broker!") }
             .doOnError { Log.error("[client->mqtt] Failed to retrieve JWT!", it) }

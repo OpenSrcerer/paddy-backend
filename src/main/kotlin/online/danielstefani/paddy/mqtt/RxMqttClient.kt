@@ -18,7 +18,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
-import online.danielstefani.paddy.controllers.MqttController
 import online.danielstefani.paddy.security.JwtAuthClient
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import reactor.core.publisher.Flux

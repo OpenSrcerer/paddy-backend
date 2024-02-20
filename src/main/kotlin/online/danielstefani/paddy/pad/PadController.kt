@@ -23,7 +23,7 @@ class PadController(
     @GET
     @Path("/{serial}")
     fun getPad(@RestPath serial: String): String {
-        return ":)"
+        return ":) Not Implemented Yet"
     }
 
     @POST
@@ -33,32 +33,32 @@ class PadController(
 //        val jwt = "123456789"
 //
 //        return padRepository.upsert(deviceSerial, jwt)
-        return ":)"
+        return ":) Not Implemented Yet"
     }
 
     @PATCH
     @Path("/{serial}")
     fun patchPad(@RestPath serial: String): String {
-        return ":)"
+        return ":) Not Implemented Yet"
     }
 
     @DELETE
     @Path("/{serial}")
     fun deletePad(@RestPath serial: String): String {
-        return ":)"
+        return ":) Not Implemented Yet"
     }
 
     // ---- Statistics ----
     @GET
     @Path("/{serial}/statistic")
     fun getPadStatistic(@RestPath serial: String): String {
-        return ":)"
+        return ":) Not Implemented Yet"
     }
 
     @PUT
     @Path("/{serial}/statistic")
     fun putPadStatistic(@RestPath serial: String): String {
-        return ":)"
+        return ":) Not Implemented Yet"
     }
 }
 

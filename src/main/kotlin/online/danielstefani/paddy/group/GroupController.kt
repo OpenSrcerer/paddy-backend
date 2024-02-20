@@ -14,23 +14,23 @@ class GroupController() {
     @GET
     @Path("/{id}")
     fun getGroup(@RestPath id: String): String {
-        return ":)"
+        return ":) Not Implemented Yet"
     }
 
     @POST
     fun postGroup(): String {
-        return ":)"
+        return ":) Not Implemented Yet"
     }
 
     @PATCH
     @Path("/{id}")
     fun patchGroup(@RestPath id: String): String {
-        return ":)"
+        return ":) Not Implemented Yet"
     }
 
     @DELETE
     @Path("/{id}")
     fun deleteGroup(@RestPath id: String): String {
-        return ":)"
+        return ":) Not Implemented Yet"
     }
 }

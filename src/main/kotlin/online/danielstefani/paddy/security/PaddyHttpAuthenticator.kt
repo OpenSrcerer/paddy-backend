@@ -13,6 +13,7 @@ import io.vertx.ext.web.RoutingContext
 import jakarta.annotation.Priority
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Alternative
+import online.danielstefani.paddy.jwt.JwtAuthClient
 
 import online.danielstefani.paddy.security.dto.AuthorizationRequestDto
 import online.danielstefani.paddy.security.dto.AuthorizationResultDto

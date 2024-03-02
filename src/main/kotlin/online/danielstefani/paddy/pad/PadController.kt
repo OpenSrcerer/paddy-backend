@@ -1,6 +1,8 @@
 package online.danielstefani.paddy.pad
 
 import io.quarkus.security.Authenticated
+import io.quarkus.security.identity.SecurityIdentity
+import io.quarkus.security.runtime.QuarkusSecurityIdentity
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.DELETE
 import jakarta.ws.rs.GET
@@ -10,55 +12,53 @@ import jakarta.ws.rs.PUT
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
+import online.danielstefani.paddy.util.username
 import org.jboss.resteasy.reactive.RestPath
+import org.jboss.resteasy.reactive.RestResponse
 
 @Path("/pad")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Authenticated
 class PadController(
-    private val padRepository: PadRepository
+    private val padRepository: PadRepository,
+    private val padService: PadService,
+    private val securityIdentity: SecurityIdentity
 ) {
 
     @GET
-    @Path("/{serial}")
-    @Authenticated
-    fun getPad(@RestPath serial: String): String {
+    @Path("/{id}")
+    fun getPad(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }
 
     @POST
-    @Path("/{serial}")
-    fun postPad(@RestPath serial: String): String {
-//        val deviceSerial = serial.ifEmpty { UUID.randomUUID().toString() }
-//        val jwt = "123456789"
-//
-//        return padRepository.upsert(deviceSerial, jwt)
-        return ":) Not Implemented Yet"
+    fun postPad(): Pad {
+        return padService.createPad(securityIdentity.username())
     }
 
     @PATCH
-    @Path("/{serial}")
-    fun patchPad(@RestPath serial: String): String {
+    @Path("/{id}")
+    fun patchPad(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }
 
     @DELETE
-    @Path("/{serial}")
-    fun deletePad(@RestPath serial: String): String {
+    @Path("/{id}")
+    fun deletePad(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }
 
     // ---- Statistics ----
     @GET
-    @Path("/{serial}/statistic")
-    fun getPadStatistic(@RestPath serial: String): String {
+    @Path("/{id}/statistic")
+    fun getPadStatistic(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }
 
     @PUT
-    @Path("/{serial}/statistic")
-    fun putPadStatistic(@RestPath serial: String): String {
+    @Path("/{id}/statistic")
+    fun putPadStatistic(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }
 }

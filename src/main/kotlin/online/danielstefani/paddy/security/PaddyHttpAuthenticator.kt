@@ -26,11 +26,9 @@ import org.eclipse.microprofile.rest.client.inject.RestClient
 @Priority(1)
 @ApplicationScoped
 class PaddyHttpAuthenticator(
-    private val cookieConfig: JwtCookieConfig
+    private val cookieConfig: JwtCookieConfig,
+    @RestClient private val paddyAuth: JwtAuthClient
 ) : HttpAuthenticationMechanism {
-
-    @RestClient
-    private lateinit var paddyAuth: JwtAuthClient
 
     /*
     Ask the authentication service whether the token is valid.

@@ -32,11 +32,9 @@ import java.util.*
 @ApplicationScoped
 class RxMqttClient(
     private val mqttConfig: MqttConfiguration,
-    private val mqttController: MqttController
+    private val mqttController: MqttController,
+    @RestClient private val paddyAuth: JwtAuthClient
 ) {
-    @RestClient
-    private lateinit var paddyAuth: JwtAuthClient
-
     // Singleton
     private var mqttClient: Mqtt5RxClient? = null
     private val mqttClientId = UUID.randomUUID()

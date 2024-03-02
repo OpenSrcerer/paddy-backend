@@ -1,7 +1,5 @@
 package online.danielstefani.paddy.util
 
-import io.quarkus.logging.Log
-import online.danielstefani.paddy.user.UserController
 import java.security.SecureRandom
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.PBEKeySpec
@@ -53,5 +51,5 @@ fun isPasswordHashMatch(
     salt: String
 ): Boolean {
     val (computedGivenHash, _) = generatePBKHash(givenPasswordHash, salt)
-    return computedGivenHash.contentEquals(Base64.decode(actualPasswordHash.toString()))
+    return computedGivenHash.contentEquals(Base64.decode(actualPasswordHash))
 }

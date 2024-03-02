@@ -5,14 +5,6 @@ networks:
     driver: bridge
 
 services:
-#  watchtower:
-#    container_name: watchtower
-#    image: containrrr/watchtower
-#    restart: on-failure
-#    volumes:
-#      - /var/run/docker.sock:/var/run/docker.sock
-#    command: --interval 30
-  
   paddy-backend:
     container_name: paddy-backend
     networks:
@@ -52,3 +44,16 @@ services:
 #      - "8084:8084"
 #      - "8883:8883"
       - "18083:18083"
+
+  neo4j:
+    image: neo4j:5.16.0
+    container_name: neo4j
+    restart: on-failure
+    volumes:
+      - /home/chronos/neo4j/data:/data
+      - /home/chronos/neo4j/logs:/logs
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/bonkersdbobcat

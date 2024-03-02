@@ -2,16 +2,13 @@ package online.danielstefani.paddy.user
 
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
-import online.danielstefani.paddy.session.dto.LoginRequestDto
+import online.danielstefani.paddy.repository.AbstractNeo4jRepository
 import org.neo4j.ogm.session.SessionFactory
 import org.neo4j.ogm.session.queryForObject
 import java.util.*
 
 @ApplicationScoped
-class UserRepository {
-
-    @Inject
-    private lateinit var neo4jSessionFactory: SessionFactory
+class UserRepository : AbstractNeo4jRepository() {
 
     /*
     Email & Username takes the same value if one
@@ -19,15 +16,14 @@ class UserRepository {
     could be email or username and that's logical.
      */
     fun get(email: String, username: String = email): User? {
-        with(neo4jSessionFactory.openSession()) {
+        with(neo4j.openSession()) {
             val existingUser = this.queryForObject<User>(
                 """
                     MATCH (node:User)
                     WHERE (node.email = "$email" 
                         OR node.username = "$username")
                     RETURN node
-                """, emptyMap()
-            )
+                """, emptyMap())
 
             return if (existingUser != null) existingUser else null
         }
@@ -39,7 +35,7 @@ class UserRepository {
         passwordHash: String,
         passwordSalt: String
     ): User? {
-        with(neo4jSessionFactory.openSession()) {
+        with(neo4j.openSession()) {
             return if (get(email, username) != null) null
             else User()
                 .also {

@@ -26,11 +26,9 @@ import java.util.*
 @Produces(MediaType.APPLICATION_JSON)
 class SessionController(
     private val userRepository: UserRepository,
-    private val cookieConfig: JwtCookieConfig
+    private val cookieConfig: JwtCookieConfig,
+    @RestClient private val paddyAuth: JwtAuthClient
 ) {
-    @RestClient
-    private lateinit var paddyAuth: JwtAuthClient
-
     /* Sets the paddy-jwt to the newly generated user jwt */
     @POST
     @Path("/login")

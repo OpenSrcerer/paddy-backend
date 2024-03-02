@@ -13,15 +13,23 @@ class UserRepository {
     @Inject
     private lateinit var neo4jSessionFactory: SessionFactory
 
-    fun getForLogin(dto: LoginRequestDto): User? {
+    /*
+    Email & Username takes the same value if one
+    argument is provided because the given value
+    could be email or username and that's logical.
+     */
+    fun get(email: String, username: String = email): User? {
         with(neo4jSessionFactory.openSession()) {
-            return this.queryForObject<User>(
+            val existingUser = this.queryForObject<User>(
                 """
-                    MATCH (node:User) 
-                    WHERE (node.email = "${dto.emailOrUsername}" OR node.username = "${dto.emailOrUsername}")
-                        AND node.passwordHash = "${dto.passwordHash}"
+                    MATCH (node:User)
+                    WHERE (node.email = "$email" 
+                        OR node.username = "$username")
                     RETURN node
-                """, emptyMap())
+                """, emptyMap()
+            )
+
+            return if (existingUser != null) existingUser else null
         }
     }
 
@@ -32,16 +40,8 @@ class UserRepository {
         passwordSalt: String
     ): User? {
         with(neo4jSessionFactory.openSession()) {
-            val existingUser = this.queryForObject<User>(
-                """
-                    MATCH (node:User)
-                    WHERE (node.email = "$email" OR node.username = "$username")
-                    RETURN node
-                """, emptyMap())
-            if (existingUser != null)
-                return null
-
-            return User()
+            return if (get(email, username) != null) null
+            else User()
                 .also {
                     it.id = UUID.randomUUID().toString()
                     it.email = email

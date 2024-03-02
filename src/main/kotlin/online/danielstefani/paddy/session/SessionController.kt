@@ -14,6 +14,7 @@ import online.danielstefani.paddy.jwt.dto.JwtResponseDto
 import online.danielstefani.paddy.jwt.dto.JwtType
 import online.danielstefani.paddy.session.dto.LoginRequestDto
 import online.danielstefani.paddy.user.UserRepository
+import online.danielstefani.paddy.util.isPasswordHashMatch
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.jboss.resteasy.reactive.RestResponse
 import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder;
@@ -34,8 +35,11 @@ class SessionController(
     @POST
     @Path("/login")
     fun login(dto: LoginRequestDto): Uni<RestResponse<Unit>> {
-        val user = userRepository.getForLogin(dto)
-            ?: return Uni.createFrom().item(RestResponse.status(Response.Status.FORBIDDEN))
+        val user = userRepository.get(dto.emailOrUsername)
+            ?: return Uni.createFrom().item(RestResponse.status(Response.Status.NOT_FOUND))
+
+        if (!isPasswordHashMatch(dto.passwordHash, user.passwordHash!!, user.passwordSalt!!))
+            return Uni.createFrom().item(RestResponse.status(Response.Status.FORBIDDEN))
 
         return paddyAuth.generateJwt(JwtRequestDto(user.username!!, JwtType.USER))
             .map { ResponseBuilder.ok<Unit>().cookie(it.buildCookie()).build() }

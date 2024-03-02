@@ -11,11 +11,8 @@ import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult
 import com.hivemq.client.mqtt.mqtt5.message.subscribe.Mqtt5Subscription
 import io.quarkus.logging.Log
 import io.quarkus.runtime.StartupEvent
-import io.reactivex.BackpressureStrategy
-import io.reactivex.Completable
-import io.reactivex.Flowable
+import io.reactivex.*
 import io.reactivex.Observable
-import io.reactivex.Single
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import online.danielstefani.paddy.jwt.JwtAuthClient
@@ -24,7 +21,6 @@ import online.danielstefani.paddy.jwt.dto.JwtType
 import online.danielstefani.paddy.util.toMono
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import reactor.util.retry.Retry
 import java.time.Duration
 import java.util.*
@@ -35,6 +31,10 @@ class RxMqttClient(
     private val mqttController: MqttController,
     @RestClient private val paddyAuth: JwtAuthClient
 ) {
+    companion object {
+        const val DEVICE_READS_TOPIC = "device-reads"
+    }
+
     // Singleton
     private var mqttClient: Mqtt5RxClient? = null
     private val mqttClientId = UUID.randomUUID()

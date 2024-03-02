@@ -8,7 +8,7 @@ import jakarta.ws.rs.core.Response
 import online.danielstefani.paddy.util.username
 import org.jboss.resteasy.reactive.RestPath
 import org.jboss.resteasy.reactive.RestResponse
-import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder
+import org.jboss.resteasy.reactive.RestResponse.*
 
 @Path("/pad")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -47,7 +47,13 @@ class PadController(
     fun deletePad(@RestPath id: String): RestResponse<Pad> {
         return padService.deletePad(securityIdentity.username(), id)?.let { ResponseBuilder.ok(it).build() }
             ?: RestResponse.status(Response.Status.NOT_FOUND)
+    }
 
+    @PATCH
+    @Path("/{id}/toggle")
+    fun togglePad(@RestPath id: String): RestResponse<Unit> {
+        return if (padService.togglePad(securityIdentity.username(), id) == true) ok()
+        else notFound()
     }
 
     // ---- Statistics ----

@@ -5,7 +5,6 @@ import online.danielstefani.paddy.pad.Pad
 import org.neo4j.ogm.annotation.Id
 import org.neo4j.ogm.annotation.NodeEntity
 import org.neo4j.ogm.annotation.Relationship
-import java.util.UUID
 
 @NodeEntity
 class User {

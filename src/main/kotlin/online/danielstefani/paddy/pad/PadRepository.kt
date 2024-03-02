@@ -10,38 +10,63 @@ import org.neo4j.ogm.session.queryForObject
 class PadRepository : AbstractNeo4jRepository() {
 
     fun get(id: String): Pad? {
-        with(neo4j.openSession()) {
+        return with(neo4j.openSession()) {
             val existingPad = this.queryForObject<Pad>(
                 """
                     MATCH (node:Pad)
-                    WHERE node.id = "$id" 
+                    WHERE ID(node) = $id
                     RETURN node
                 """, emptyMap())
 
-            return if (existingPad != null) existingPad else null
+            if (existingPad != null) existingPad
+            else null
         }
     }
 
+
+
+    fun getUserPad(user: User, id: String): Pad? {
+        return with(neo4j.openSession()) {
+            this.queryForObject<Pad>(
+                """
+                    MATCH (ux:User { username: "${user.username}" })
+                        -[:OWNS]-> (px:Pad)
+                    WHERE ID(px) = $id
+                    RETURN px
+                """, emptyMap<String, String>())
+        }
+    }
+
+
     fun getAllUserPads(user: User): List<Pad> {
-        with(neo4j.openSession()) {
+        return with(neo4j.openSession()) {
             val result = this.query(
                 """
-                    MATCH (ux:User { username: "${user.username}" }) -[:OWNS]-> (px:Pad)
+                    MATCH (ux:User { username: "${user.username}" })
+                        -[:OWNS]-> (px:Pad)
                     RETURN px
                 """, emptyMap<String, String>())
 
-            return result.get()
+            result.get()
         }
     }
 
-    fun create(user: User): Pad {
-        with(neo4j.openSession()) {
-            return Pad()
-                .also {
-                    it.user = user
+    fun createUserPad(user: User): Pad {
+        return with(neo4j.openSession()) {
+            Pad().also {
+                it.user = user
 
-                    this.save(it)
-                }
+                this.save(it)
+            }
+        }
+    }
+
+    fun deleteUserPad(user: User, id: String): Pad? {
+        return with(neo4j.openSession()) {
+            val existingPad = getUserPad(user, id)
+
+            if (existingPad == null) null
+            else existingPad.also { this.delete(it) }
         }
     }
 }

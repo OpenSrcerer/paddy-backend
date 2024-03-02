@@ -8,11 +8,20 @@ import org.eclipse.microprofile.rest.client.inject.RestClient
 @ApplicationScoped
 class PadService(
     private val padRepository: PadRepository,
-    private val userRepository: UserRepository,
-    @RestClient private val paddyAuth: JwtAuthClient
+    private val userRepository: UserRepository
 ) {
+    fun getAllUserPads(username: String): List<Pad> {
+        val user = userRepository.get(username)
+        return padRepository.getAllUserPads(user!!)
+    }
+
     fun createPad(username: String): Pad {
         val user = userRepository.get(username)
-        return padRepository.create(user!!)
+        return padRepository.createUserPad(user!!)
+    }
+
+    fun deletePad(username: String, padId: String): Pad? {
+        val user = userRepository.get(username)
+        return padRepository.deleteUserPad(user!!, padId)
     }
 }

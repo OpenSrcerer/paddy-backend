@@ -38,10 +38,4 @@ class UserController(
 
         return RestResponse.status(Response.Status.CREATED, user)
     }
-
-    @GET
-    @Path("/pad")
-    fun getAllUserPads(): List<Pad> {
-        return userService.getAllUserPads(securityIdentity.username())
-    }
 }

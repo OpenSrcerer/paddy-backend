@@ -10,8 +10,5 @@ class UserService(
     private val userRepository: UserRepository,
     private val padRepository: PadRepository
 ) {
-    fun getAllUserPads(username: String): List<Pad> {
-        val user = userRepository.get(username)
-        return padRepository.getAllUserPads(user!!)
-    }
+
 }

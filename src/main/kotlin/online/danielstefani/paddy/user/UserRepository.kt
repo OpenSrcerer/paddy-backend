@@ -1,9 +1,7 @@
 package online.danielstefani.paddy.user
 
 import jakarta.enterprise.context.ApplicationScoped
-import jakarta.inject.Inject
 import online.danielstefani.paddy.repository.AbstractNeo4jRepository
-import org.neo4j.ogm.session.SessionFactory
 import org.neo4j.ogm.session.queryForObject
 import java.util.*
 
@@ -16,7 +14,7 @@ class UserRepository : AbstractNeo4jRepository() {
     could be email or username and that's logical.
      */
     fun get(email: String, username: String = email): User? {
-        with(neo4j.openSession()) {
+        return with(neo4j.openSession()) {
             val existingUser = this.queryForObject<User>(
                 """
                     MATCH (node:User)
@@ -25,7 +23,8 @@ class UserRepository : AbstractNeo4jRepository() {
                     RETURN node
                 """, emptyMap())
 
-            return if (existingUser != null) existingUser else null
+            if (existingUser != null) existingUser
+            else null
         }
     }
 
@@ -35,8 +34,8 @@ class UserRepository : AbstractNeo4jRepository() {
         passwordHash: String,
         passwordSalt: String
     ): User? {
-        with(neo4j.openSession()) {
-            return if (get(email, username) != null) null
+        return with(neo4j.openSession()) {
+            if (get(email, username) != null) null
             else User()
                 .also {
                     it.id = UUID.randomUUID().toString()

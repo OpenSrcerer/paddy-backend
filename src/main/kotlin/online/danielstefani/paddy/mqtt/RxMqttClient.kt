@@ -21,6 +21,7 @@ import jakarta.enterprise.event.Observes
 import online.danielstefani.paddy.jwt.JwtAuthClient
 import online.danielstefani.paddy.jwt.dto.JwtRequestDto
 import online.danielstefani.paddy.jwt.dto.JwtType
+import online.danielstefani.paddy.util.toMono
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -46,7 +47,7 @@ class RxMqttClient(
     fun startup(@Observes event: StartupEvent) {
 
         // Try to get the auth token first
-        Mono.just(paddyAuth.generateJwt(JwtRequestDto("paddy-backend", JwtType.ADMIN)))
+        paddyAuth.generateJwt(JwtRequestDto("paddy-backend", JwtType.ADMIN)).toMono()
             .map { it.jwt }
             .doOnSubscribe { Log.info("[client->mqtt] Retrieving JWT to connect to broker...") }
             .doOnSuccess { Log.info("[client->mqtt] Got JWT <${it.slice(0..10)}...> connecting to broker!") }

@@ -22,6 +22,7 @@ class PadController(
 
     @GET
     @Path("/{serial}")
+    @Authenticated
     fun getPad(@RestPath serial: String): String {
         return ":) Not Implemented Yet"
     }

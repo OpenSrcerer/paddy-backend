@@ -24,14 +24,9 @@ import java.util.*
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 class SessionController(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val cookieConfig: JwtCookieConfig
 ) {
-    companion object {
-        const val JWT_COOKIE_NAME = "paddy-jwt"
-        const val JWT_PATH        = "/"
-        const val JWT_DOMAIN      = ".danielstefani.online"
-    }
-
     @RestClient
     private lateinit var paddyAuth: JwtAuthClient
 
@@ -39,11 +34,10 @@ class SessionController(
     @POST
     @Path("/login")
     fun login(dto: LoginRequestDto): Uni<RestResponse<Unit>> {
-        val user = userRepository.get(dto)
+        val user = userRepository.getForLogin(dto)
             ?: return Uni.createFrom().item(RestResponse.status(Response.Status.FORBIDDEN))
 
-        return Uni.createFrom()
-            .item { paddyAuth.generateJwt(JwtRequestDto(user.username, JwtType.USER)) }
+        return paddyAuth.generateJwt(JwtRequestDto(user.username!!, JwtType.USER))
             .map { ResponseBuilder.ok<Unit>().cookie(it.buildCookie()).build() }
     }
 
@@ -56,9 +50,12 @@ class SessionController(
     }
 
     private fun JwtResponseDto.buildCookie(): NewCookie {
-        return NewCookie.Builder(JWT_COOKIE_NAME)
-            .path(JWT_PATH)
-            .domain(JWT_DOMAIN)
+        return NewCookie.Builder(cookieConfig.name())
+            .path(cookieConfig.path())
+            .domain(cookieConfig.domain())
+            .sameSite(NewCookie.SameSite.STRICT)
+            .secure(true)
+            .httpOnly(true)
             .value(this.jwt)
             .expiry(Date.from(Instant.ofEpochSecond(this.absoluteExpiryUnixSeconds)))
             .build()

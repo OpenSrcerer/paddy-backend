@@ -9,7 +9,7 @@ class ScheduledPingPong(
     private val rxMqttClient: RxMqttClient
 ) {
 
-    @Scheduled(every = "15s")
+//    @Scheduled(every = "15s")
     fun pingDevicesPeriodically() {
         rxMqttClient.publish("device-reads", "{\"message\":\"Ping!\"}")
             ?.subscribe()

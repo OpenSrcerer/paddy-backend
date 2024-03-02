@@ -18,13 +18,16 @@ import online.danielstefani.paddy.jwt.JwtAuthClient
 import online.danielstefani.paddy.security.dto.AuthorizationRequestDto
 import online.danielstefani.paddy.security.dto.AuthorizationResultDto
 import online.danielstefani.paddy.security.dto.AuthorizationResultDto.AuthorizationResult
+import online.danielstefani.paddy.session.JwtCookieConfig
 import org.eclipse.microprofile.rest.client.inject.RestClient
 
 
 @Alternative
 @Priority(1)
 @ApplicationScoped
-class PaddyHttpAuthenticator : HttpAuthenticationMechanism {
+class PaddyHttpAuthenticator(
+    private val cookieConfig: JwtCookieConfig
+) : HttpAuthenticationMechanism {
 
     @RestClient
     private lateinit var paddyAuth: JwtAuthClient
@@ -34,13 +37,12 @@ class PaddyHttpAuthenticator : HttpAuthenticationMechanism {
     If the token is valid, set the principal and role to the "sub"
     claim of the JWT (the server should return it on the
     "resource" field of the DTO)
-     */
+    */
     override fun authenticate(
         context: RoutingContext?,
         identityProviderManager: IdentityProviderManager?
     ): Uni<SecurityIdentity> {
-        val jwt = context!!.request().getHeader("Authorization")
-            ?.replace("Bearer ", "")
+        val jwt = context!!.request().getCookie(cookieConfig.name())?.value
 
         return checkJwt(jwt)
             .onItem().invoke { res -> Log.info("Principal: ${res.resource} // Access Result: ${res.result}") }

@@ -22,7 +22,7 @@ interface JwtAuthClient {
 
     @POST
     @Path("/jwt/")
-    fun generateJwt(dto: JwtRequestDto): JwtResponseDto
+    fun generateJwt(dto: JwtRequestDto): Uni<JwtResponseDto>
 
     @POST
     @Path("/validate")

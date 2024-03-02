@@ -19,7 +19,7 @@ class UserController(
     @POST
     @Path("/signup")
     fun login(dto: SignupRequestDto): RestResponse<User> {
-        val user = userRepository.create(dto.email, dto.username, dto.passwordHash)
+        val user = userRepository.create(dto.email, dto.username, dto.passwordHash, dto.passwordSalt)
             ?: return RestResponse.status(Response.Status.CONFLICT)
 
         return RestResponse.status(Response.Status.CREATED, user)

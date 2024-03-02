@@ -7,13 +7,13 @@ import org.neo4j.ogm.annotation.NodeEntity
 import org.neo4j.ogm.annotation.Relationship
 
 @NodeEntity
-data class Pad(
+class Pad {
     @Id
-    val serial: String,
+    val serial: String? = null
 
-    var jwt: String,
+    var jwt: String? = null
 
     @JsonIgnore
     @Relationship(type = "OWNS", direction = Relationship.Direction.INCOMING)
-    val user: User
-)
+    var user: User? = null
+}

@@ -7,16 +7,18 @@ import org.neo4j.ogm.annotation.Relationship
 import java.util.UUID
 
 @NodeEntity
-data class User(
+class User {
     @Id
-    val id: UUID,
+    var id: String? = null
 
-    val email: String,
+    var email: String? = null
 
-    val username: String,
+    var username: String? = null
 
-    val password: String, // SHA-256 hash of password
+    var passwordHash: String? = null // PBKDF2 hash
+
+    var passwordSalt: String? = null // PBKDF2 salt
 
     @Relationship(type = "OWNS", direction = Relationship.Direction.OUTGOING)
-    val pads: Set<Pad>
-)
+    var pads = setOf<Pad>()
+}

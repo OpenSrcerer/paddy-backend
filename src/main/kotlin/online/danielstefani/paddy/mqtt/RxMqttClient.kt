@@ -50,7 +50,7 @@ class RxMqttClient(
             .doOnSubscribe { Log.info("[client->mqtt] Retrieving JWT to connect to broker...") }
             .doOnSuccess { Log.info("[client->mqtt] Got JWT <${it.slice(0..10)}...> connecting to broker!") }
             .doOnError { Log.error("[client->mqtt] Failed to retrieve JWT!", it) }
-            .retryWhen(Retry.backoff(3, Duration.ofSeconds(5)))
+            .retryWhen(Retry.fixedDelay(Long.MAX_VALUE, Duration.ofSeconds(30)))
             .subscribe {
                 jwtUsername = it
                 rebuildMqttClient()

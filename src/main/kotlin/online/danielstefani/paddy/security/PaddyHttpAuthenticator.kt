@@ -18,7 +18,6 @@ import online.danielstefani.paddy.jwt.JwtAuthClient
 import online.danielstefani.paddy.security.dto.AuthorizationRequestDto
 import online.danielstefani.paddy.security.dto.AuthorizationResultDto
 import online.danielstefani.paddy.security.dto.AuthorizationResultDto.AuthorizationResult
-import online.danielstefani.paddy.session.JwtCookieConfig
 import org.eclipse.microprofile.rest.client.inject.RestClient
 
 
@@ -26,7 +25,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient
 @Priority(1)
 @ApplicationScoped
 class PaddyHttpAuthenticator(
-    private val cookieConfig: JwtCookieConfig,
     @RestClient private val paddyAuth: JwtAuthClient
 ) : HttpAuthenticationMechanism {
 
@@ -40,7 +38,7 @@ class PaddyHttpAuthenticator(
         context: RoutingContext?,
         identityProviderManager: IdentityProviderManager?
     ): Uni<SecurityIdentity> {
-        val jwt = context!!.request().getCookie(cookieConfig.name())?.value
+        val jwt = context!!.request().getHeader("Authorization")?.replace("Bearer ", "")
 
         return checkJwt(jwt)
             .onItem().invoke { res -> Log.info("Principal: ${res.resource} // Access Result: ${res.result}") }

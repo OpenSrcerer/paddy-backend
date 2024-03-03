@@ -6,10 +6,10 @@ import javax.crypto.spec.PBEKeySpec
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-private val PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA512"
-private val PBKDF2_ITERATIONS = 210000 // From OWASP
-private val PBKDF2_KEY_LENGTH = 256 // Bits
-private val PBKDF2_SALT_LENGTH = 128 // Bits
+private const val PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA512"
+private const val PBKDF2_ITERATIONS = 210000 // From OWASP
+private const val PBKDF2_KEY_LENGTH = 256 // Bits
+private const val PBKDF2_SALT_LENGTH = 128 // Bits
 
 @OptIn(ExperimentalEncodingApi::class)
 fun generatePBKHash(passwordHash: String, salt: String? = null): Pair<ByteArray, ByteArray> {

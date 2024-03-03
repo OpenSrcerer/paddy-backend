@@ -10,8 +10,8 @@ class MqttController(
 ) {
 
     fun readMessage(message: Mqtt5Publish) {
-        rxMqttClient.publish("device-reads", String(message.payloadAsBytes))
-            ?.subscribe()
+//        rxMqttClient.publish("device-reads", String(message.payloadAsBytes))
+//            ?.subscribe()
     }
 
     fun readError(error: Throwable) {

@@ -16,9 +16,7 @@ import online.danielstefani.paddy.user.UserRepository
 import online.danielstefani.paddy.util.isPasswordHashMatch
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.jboss.resteasy.reactive.RestResponse
-import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder;
-import java.time.Instant
-import java.util.*
+import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder
 
 @Path("/session")
 @Consumes(MediaType.APPLICATION_JSON)

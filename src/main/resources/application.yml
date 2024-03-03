@@ -16,9 +16,12 @@ quarkus:
           paths: /*
           policy: paddy-http-authorizer
     cors:
+      ~: true
       origins: "*" # TODO: fix this later to proper origins
       headers: accept, authorization, content-type, x-requested-with
       methods: OPTIONS, GET, POST, PATCH, PUT, DELETE
+      access-control-allow-credentials: true
+      access-control-max-age: 1H
 
   rest-client:
     jwt:

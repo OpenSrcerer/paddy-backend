@@ -15,6 +15,10 @@ quarkus:
         authorizer:
           paths: /*
           policy: paddy-http-authorizer
+    cors:
+      origins: * # TODO: fix this later to proper origins
+      headers: accept, authorization, content-type, x-requested-with
+      methods: OPTIONS, GET, POST, PATCH, PUT, DELETE
 
   rest-client:
     jwt:

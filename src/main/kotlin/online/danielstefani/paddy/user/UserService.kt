@@ -1,14 +1,12 @@
 package online.danielstefani.paddy.user
 
 import jakarta.enterprise.context.ApplicationScoped
-import online.danielstefani.paddy.pad.Pad
-import online.danielstefani.paddy.pad.PadRepository
-import org.neo4j.ogm.session.queryForObject
+import online.danielstefani.paddy.pad.DaemonRepository
 
 @ApplicationScoped
 class UserService(
     private val userRepository: UserRepository,
-    private val padRepository: PadRepository
+    private val daemonRepository: DaemonRepository
 ) {
 
 }

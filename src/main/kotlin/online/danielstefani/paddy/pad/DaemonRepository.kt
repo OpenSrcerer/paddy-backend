@@ -7,30 +7,30 @@ import online.danielstefani.paddy.util.get
 import org.neo4j.ogm.session.queryForObject
 
 @ApplicationScoped
-class PadRepository : AbstractNeo4jRepository() {
+class DaemonRepository : AbstractNeo4jRepository() {
 
-    fun get(id: String): Pad? {
+    fun get(id: String): Daemon? {
         return with(neo4j.openSession()) {
-            val existingPad = this.queryForObject<Pad>(
+            val existingDaemon = this.queryForObject<Daemon>(
                 """
-                    MATCH (node:Pad)
+                    MATCH (node:Daemon)
                     WHERE ID(node) = $id
                     RETURN node
                 """, emptyMap())
 
-            if (existingPad != null) existingPad
+            if (existingDaemon != null) existingDaemon
             else null
         }
     }
 
 
 
-    fun getUserPad(user: User, id: String): Pad? {
+    fun getUserDaemon(user: User, id: String): Daemon? {
         return with(neo4j.openSession()) {
-            this.queryForObject<Pad>(
+            this.queryForObject<Daemon>(
                 """
                     MATCH (ux:User { username: "${user.username}" })
-                        -[:OWNS]-> (px:Pad)
+                        -[:OWNS]-> (px:Daemon)
                     WHERE ID(px) = $id
                     RETURN px
                 """, emptyMap<String, String>())
@@ -38,12 +38,12 @@ class PadRepository : AbstractNeo4jRepository() {
     }
 
 
-    fun getAllUserPads(user: User): List<Pad> {
+    fun getAllUserDaemons(user: User): List<Daemon> {
         return with(neo4j.openSession()) {
             val result = this.query(
                 """
                     MATCH (ux:User { username: "${user.username}" })
-                        -[:OWNS]-> (px:Pad)
+                        -[:OWNS]-> (px:Daemon)
                     RETURN px
                 """, emptyMap<String, String>())
 
@@ -51,9 +51,9 @@ class PadRepository : AbstractNeo4jRepository() {
         }
     }
 
-    fun createUserPad(user: User): Pad {
+    fun createUserDaemon(user: User): Daemon {
         return with(neo4j.openSession()) {
-            Pad().also {
+            Daemon().also {
                 it.user = user
 
                 this.save(it)
@@ -61,9 +61,9 @@ class PadRepository : AbstractNeo4jRepository() {
         }
     }
 
-    fun deleteUserPad(user: User, id: String): Pad? {
+    fun deleteUserDaemon(user: User, id: String): Daemon? {
         return with(neo4j.openSession()) {
-            val existingPad = getUserPad(user, id)
+            val existingPad = getUserDaemon(user, id)
 
             if (existingPad == null) null
             else existingPad.also { this.delete(it) }

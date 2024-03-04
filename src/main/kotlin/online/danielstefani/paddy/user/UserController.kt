@@ -2,16 +2,13 @@ package online.danielstefani.paddy.user
 
 import io.quarkus.security.identity.SecurityIdentity
 import jakarta.ws.rs.Consumes
-import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
 import jakarta.ws.rs.Produces
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import online.danielstefani.paddy.pad.Pad
 import online.danielstefani.paddy.user.dto.SignupRequestDto
 import online.danielstefani.paddy.util.generatePBKHashBase64
-import online.danielstefani.paddy.util.username
 import org.jboss.resteasy.reactive.RestResponse
 
 

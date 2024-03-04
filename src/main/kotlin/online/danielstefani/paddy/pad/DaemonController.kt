@@ -10,62 +10,62 @@ import org.jboss.resteasy.reactive.RestPath
 import org.jboss.resteasy.reactive.RestResponse
 import org.jboss.resteasy.reactive.RestResponse.*
 
-@Path("/pad")
+@Path("/daemon")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Authenticated
-class PadController(
-    private val padRepository: PadRepository,
-    private val padService: PadService,
+class DaemonController(
+    private val daemonRepository: DaemonRepository,
+    private val daemonService: DaemonService,
     private val securityIdentity: SecurityIdentity
 ) {
 
     @GET
     @Path("/{id}")
-    fun getPad(@RestPath id: String): String {
+    fun getDaemon(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }
 
     @GET
-    fun getAllUserPads(): List<Pad> {
-        return padService.getAllUserPads(securityIdentity.username())
+    fun getAllUserDaemons(): List<Daemon> {
+        return daemonService.getAllUserDaemons(securityIdentity.username())
     }
 
     @POST
-    fun postPad(): Pad {
-        return padService.createPad(securityIdentity.username())
+    fun postDaemon(): Daemon {
+        return daemonService.createDaemon(securityIdentity.username())
     }
 
     @PATCH
     @Path("/{id}")
-    fun patchPad(@RestPath id: String): String {
+    fun patchDaemon(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }
 
     @DELETE
     @Path("/{id}")
-    fun deletePad(@RestPath id: String): RestResponse<Pad> {
-        return padService.deletePad(securityIdentity.username(), id)?.let { ResponseBuilder.ok(it).build() }
+    fun deleteDaemon(@RestPath id: String): RestResponse<Daemon> {
+        return daemonService.deleteDaemon(securityIdentity.username(), id)?.let { ResponseBuilder.ok(it).build() }
             ?: RestResponse.status(Response.Status.NOT_FOUND)
     }
 
     @PATCH
     @Path("/{id}/toggle")
-    fun togglePad(@RestPath id: String): RestResponse<Unit> {
-        return if (padService.togglePad(securityIdentity.username(), id) == true) ok()
+    fun toggleDaemon(@RestPath id: String): RestResponse<Unit> {
+        return if (daemonService.toggleDaemon(securityIdentity.username(), id) == true) ok()
         else notFound()
     }
 
     // ---- Statistics ----
     @GET
     @Path("/{id}/statistic")
-    fun getPadStatistic(@RestPath id: String): String {
+    fun getDaemonStatistic(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }
 
     @PUT
     @Path("/{id}/statistic")
-    fun putPadStatistic(@RestPath id: String): String {
+    fun putDaemonStatistic(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }
 }

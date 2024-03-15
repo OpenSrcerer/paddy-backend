@@ -1,4 +1,4 @@
-package online.danielstefani.paddy.pad
+package online.danielstefani.paddy.daemon
 
 import io.quarkus.security.Authenticated
 import io.quarkus.security.identity.SecurityIdentity
@@ -32,8 +32,14 @@ class DaemonController(
     }
 
     @POST
-    fun postDaemon(): Daemon {
-        return daemonService.createDaemon(securityIdentity.username())
+    @Path("/{id}")
+    fun postDaemon(@RestPath id: String): RestResponse<Daemon> {
+        val daemonId = try { id.toLong() } catch (e: NumberFormatException) {
+            return status(Response.Status.BAD_REQUEST)
+        }
+
+        return ResponseBuilder.ok(
+            daemonService.createDaemon(securityIdentity.username(), daemonId)).build()
     }
 
     @PATCH
@@ -46,13 +52,13 @@ class DaemonController(
     @Path("/{id}")
     fun deleteDaemon(@RestPath id: String): RestResponse<Daemon> {
         return daemonService.deleteDaemon(securityIdentity.username(), id)?.let { ResponseBuilder.ok(it).build() }
-            ?: RestResponse.status(Response.Status.NOT_FOUND)
+            ?: status(Response.Status.NOT_FOUND)
     }
 
     @PATCH
     @Path("/{id}/toggle")
     fun toggleDaemon(@RestPath id: String): RestResponse<Unit> {
-        return if (daemonService.toggleDaemon(securityIdentity.username(), id) == true) ok()
+        return if (daemonService.toggleDaemon(securityIdentity.username(), id)) ok()
         else notFound()
     }
 

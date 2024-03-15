@@ -1,7 +1,7 @@
 package online.danielstefani.paddy.user
 
 import jakarta.enterprise.context.ApplicationScoped
-import online.danielstefani.paddy.pad.DaemonRepository
+import online.danielstefani.paddy.daemon.DaemonRepository
 
 @ApplicationScoped
 class UserService(

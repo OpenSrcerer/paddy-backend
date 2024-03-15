@@ -1,4 +1,4 @@
-package online.danielstefani.paddy.pad
+package online.danielstefani.paddy.daemon
 
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.repository.AbstractNeo4jRepository
@@ -51,9 +51,10 @@ class DaemonRepository : AbstractNeo4jRepository() {
         }
     }
 
-    fun createUserDaemon(user: User): Daemon {
+    fun createUserDaemon(user: User, id: Long): Daemon {
         return with(neo4j.openSession()) {
             Daemon().also {
+                it.id = id
                 it.user = user
 
                 this.save(it)

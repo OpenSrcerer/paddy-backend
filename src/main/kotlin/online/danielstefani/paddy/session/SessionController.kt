@@ -36,6 +36,6 @@ class SessionController(
             return Uni.createFrom().item(RestResponse.status(Response.Status.FORBIDDEN))
 
         return paddyAuth.generateJwt(JwtRequestDto(user.username!!, JwtType.USER))
-            .map { ResponseBuilder.ok<JwtResponseDto>(it).build() }
+            .map { ResponseBuilder.ok(it).build() }
     }
 }

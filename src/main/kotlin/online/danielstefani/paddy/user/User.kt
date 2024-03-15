@@ -1,7 +1,7 @@
 package online.danielstefani.paddy.user
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import online.danielstefani.paddy.pad.Daemon
+import online.danielstefani.paddy.daemon.Daemon
 import org.neo4j.ogm.annotation.Id
 import org.neo4j.ogm.annotation.NodeEntity
 import org.neo4j.ogm.annotation.Relationship

@@ -1,4 +1,4 @@
-package online.danielstefani.paddy.pad
+package online.danielstefani.paddy.daemon
 
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.mqtt.RxMqttClient
@@ -15,9 +15,9 @@ class DaemonService(
         return daemonRepository.getAllUserDaemons(user!!)
     }
 
-    fun createDaemon(username: String): Daemon {
+    fun createDaemon(username: String, daemonId: Long): Daemon {
         val user = userRepository.get(username)
-        return daemonRepository.createUserDaemon(user!!)
+        return daemonRepository.createUserDaemon(user!!, daemonId)
     }
 
     fun deleteDaemon(username: String, daemonId: String): Daemon? {

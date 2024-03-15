@@ -2,7 +2,6 @@ package online.danielstefani.paddy.jwt
 
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
-import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
 import online.danielstefani.paddy.jwt.dto.JwtRequestDto

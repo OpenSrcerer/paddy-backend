@@ -2,9 +2,11 @@ package online.danielstefani.paddy.daemon
 
 import io.quarkus.security.Authenticated
 import io.quarkus.security.identity.SecurityIdentity
+import io.smallrye.mutiny.Uni
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import online.danielstefani.paddy.daemon.dto.CreateDaemonResponse
 import online.danielstefani.paddy.util.username
 import org.jboss.resteasy.reactive.RestPath
 import org.jboss.resteasy.reactive.RestResponse
@@ -15,7 +17,6 @@ import org.jboss.resteasy.reactive.RestResponse.*
 @Produces(MediaType.APPLICATION_JSON)
 @Authenticated
 class DaemonController(
-    private val daemonRepository: DaemonRepository,
     private val daemonService: DaemonService,
     private val securityIdentity: SecurityIdentity
 ) {
@@ -33,13 +34,13 @@ class DaemonController(
 
     @POST
     @Path("/{id}")
-    fun postDaemon(@RestPath id: String): RestResponse<Daemon> {
+    fun postDaemon(@RestPath id: String): Uni<RestResponse<CreateDaemonResponse>> {
         val daemonId = try { id.toLong() } catch (e: NumberFormatException) {
-            return status(Response.Status.BAD_REQUEST)
+            return Uni.createFrom().item(status(Response.Status.BAD_REQUEST))
         }
 
-        return ResponseBuilder.ok(
-            daemonService.createDaemon(securityIdentity.username(), daemonId)).build()
+        return daemonService.createDaemon(securityIdentity.username(), daemonId)
+            .map { ResponseBuilder.ok(it).build() }
     }
 
     @PATCH

@@ -7,7 +7,15 @@ import org.neo4j.ogm.annotation.NodeEntity
 import org.neo4j.ogm.annotation.Relationship
 
 @NodeEntity
-class Daemon {
+open class Daemon() {
+
+    constructor(
+        daemon: Daemon
+    ) : this() {
+        this.id = daemon.id
+        this.user = daemon.user
+    }
+
     @Id
     var id: Long? = null
 

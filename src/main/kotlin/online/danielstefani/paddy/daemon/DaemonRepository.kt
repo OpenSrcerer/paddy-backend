@@ -11,15 +11,12 @@ class DaemonRepository : AbstractNeo4jRepository() {
 
     fun get(id: String): Daemon? {
         return with(neo4j.openSession()) {
-            val existingDaemon = this.queryForObject<Daemon>(
+            this.queryForObject<Daemon>(
                 """
                     MATCH (node:Daemon)
                     WHERE ID(node) = $id
                     RETURN node
                 """, emptyMap())
-
-            if (existingDaemon != null) existingDaemon
-            else null
         }
     }
 

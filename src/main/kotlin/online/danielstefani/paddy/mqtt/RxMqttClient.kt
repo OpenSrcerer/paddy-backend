@@ -32,7 +32,7 @@ class RxMqttClient(
     @RestClient private val paddyAuth: JwtAuthClient
 ) {
     companion object {
-        const val DEVICE_READS_TOPIC = "device-reads"
+        const val DEVICE_READS_TOPIC = "daemon/v1/reads"
     }
 
     // Singleton

@@ -34,13 +34,16 @@ class DaemonController(
 
     @POST
     @Path("/{id}")
-    fun postDaemon(@RestPath id: String): Uni<RestResponse<CreateDaemonResponse>> {
+    fun postDaemon(@RestPath id: String): Uni<RestResponse<CreateDaemonResponse?>> {
         val daemonId = try { id.toLong() } catch (e: NumberFormatException) {
             return Uni.createFrom().item(status(Response.Status.BAD_REQUEST))
         }
 
         return daemonService.createDaemon(securityIdentity.username(), daemonId)
-            .map { ResponseBuilder.ok(it).build() }
+            .map {
+                if (it != null) ResponseBuilder.ok(it).build()
+                else status(Response.Status.CONFLICT)
+            }
     }
 
     @PATCH

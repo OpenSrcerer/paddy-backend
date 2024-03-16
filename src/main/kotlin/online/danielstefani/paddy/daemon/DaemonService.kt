@@ -22,14 +22,17 @@ class DaemonService(
         return daemonRepository.getAllUserDaemons(user!!)
     }
 
-    fun createDaemon(username: String, daemonId: Long): Uni<CreateDaemonResponse> {
+    fun createDaemon(username: String, daemonId: Long): Uni<CreateDaemonResponse?> {
         val user = userRepository.get(username)
 
         val daemonUni = Uni.createFrom().item { daemonRepository.createUserDaemon(user!!, daemonId) }
         val jwtUni = paddyAuth.generateJwt(JwtRequestDto("$daemonId", JwtType.DAEMON))
 
         return Uni.combine().all().unis(daemonUni, jwtUni)
-            .with { daemon, jwtRes -> CreateDaemonResponse(daemon, jwtRes.jwt) }
+            .with { daemon, jwtRes ->
+                if (daemon != null) CreateDaemonResponse(daemon, jwtRes.jwt)
+                else null
+            }
     }
 
     fun deleteDaemon(username: String, daemonId: String): Daemon? {

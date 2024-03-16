@@ -51,8 +51,11 @@ class DaemonRepository : AbstractNeo4jRepository() {
         }
     }
 
-    fun createUserDaemon(user: User, id: Long): Daemon {
+    fun createUserDaemon(user: User, id: Long): Daemon? {
         return with(neo4j.openSession()) {
+            val daemon = get("$id")
+            if (daemon != null) return null
+
             Daemon().also {
                 it.id = id
                 it.user = user
@@ -64,10 +67,7 @@ class DaemonRepository : AbstractNeo4jRepository() {
 
     fun deleteUserDaemon(user: User, id: String): Daemon? {
         return with(neo4j.openSession()) {
-            val existingPad = getUserDaemon(user, id)
-
-            if (existingPad == null) null
-            else existingPad.also { this.delete(it) }
+            getUserDaemon(user, id)?.also { this.delete(it) }
         }
     }
 }

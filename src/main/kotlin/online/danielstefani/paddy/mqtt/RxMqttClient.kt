@@ -31,10 +31,6 @@ class RxMqttClient(
     private val mqttController: MqttController,
     @RestClient private val paddyAuth: JwtAuthClient
 ) {
-    companion object {
-        const val DEVICE_READS_TOPIC = "daemon/v1/reads"
-    }
-
     // Singleton
     private var mqttClient: Mqtt5RxClient? = null
     private val mqttClientId = UUID.randomUUID()
@@ -57,7 +53,11 @@ class RxMqttClient(
             }
     }
 
-    fun publish(topic: String, message: String): Flowable<Mqtt5PublishResult>? {
+    fun publish(
+        message: String,
+        daemonId: String,
+        topic: String = "${mqttConfig.deviceReadTopic()}/$daemonId"
+    ): Flowable<Mqtt5PublishResult>? {
         return mqttClient?.publish(
             Flowable.just(Mqtt5Publish.builder()
                 .topic(topic)

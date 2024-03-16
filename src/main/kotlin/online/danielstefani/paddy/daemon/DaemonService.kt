@@ -45,7 +45,7 @@ class DaemonService(
         val daemon = daemonRepository.getUserDaemon(user!!, daemonId)
             ?: return false
 
-        rxMqttClient.publish("${RxMqttClient.DEVICE_READS_TOPIC}/$daemonId", "toggle")
+        rxMqttClient.publish("toggle", daemonId)
             ?.subscribe()
         return true
     }

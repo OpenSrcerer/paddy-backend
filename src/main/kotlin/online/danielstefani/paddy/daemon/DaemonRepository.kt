@@ -13,8 +13,7 @@ class DaemonRepository : AbstractNeo4jRepository() {
         return with(neo4j.openSession()) {
             this.queryForObject<Daemon>(
                 """
-                    MATCH (node:Daemon)
-                    WHERE ID(node) = $id
+                    MATCH (node:Daemon { id: "$id" })
                     RETURN node
                 """, emptyMap())
         }
@@ -27,9 +26,9 @@ class DaemonRepository : AbstractNeo4jRepository() {
             this.queryForObject<Daemon>(
                 """
                     MATCH (ux:User { username: "${user.username}" })
-                        -[:OWNS]-> (px:Daemon)
-                    WHERE ID(px) = $id
-                    RETURN px
+                        -[:OWNS]-> (dx:Daemon)
+                    WHERE dx.id = "$id"
+                    RETURN dx
                 """, emptyMap<String, String>())
         }
     }
@@ -40,19 +39,19 @@ class DaemonRepository : AbstractNeo4jRepository() {
             val result = this.query(
                 """
                     MATCH (ux:User { username: "${user.username}" })
-                        -[:OWNS]-> (px:Daemon)
-                    RETURN px
+                        -[:OWNS]-> (dx:Daemon)
+                    RETURN dx
                 """, emptyMap<String, String>())
 
             result.get()
         }
     }
 
-    fun createUserDaemon(user: User, id: Long): Daemon? {
-        return with(neo4j.openSession()) {
-            val daemon = get("$id")
-            if (daemon != null) return null
+    fun createUserDaemon(user: User, id: String): Daemon? {
+        val daemon = get(id)
+        if (daemon != null) return null
 
+        return with(neo4j.openSession()) {
             Daemon().also {
                 it.id = id
                 it.user = user

@@ -15,16 +15,13 @@ class UserRepository : AbstractNeo4jRepository() {
      */
     fun get(email: String, username: String = email): User? {
         return with(neo4j.openSession()) {
-            val existingUser = this.queryForObject<User>(
+            this.queryForObject<User>(
                 """
                     MATCH (node:User)
                     WHERE (node.email = "$email" 
                         OR node.username = "$username")
                     RETURN node
                 """, emptyMap())
-
-            if (existingUser != null) existingUser
-            else null
         }
     }
 

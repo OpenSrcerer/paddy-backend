@@ -55,9 +55,10 @@ class RxMqttClient(
 
     fun publish(
         message: String,
-        daemonId: String,
-        topic: String = "${mqttConfig.deviceReadTopic()}/$daemonId"
+        daemonId: String
     ): Flowable<Mqtt5PublishResult>? {
+        val topic = mqttConfig.deviceReadTopic() + "/$daemonId"
+
         return mqttClient?.publish(
             Flowable.just(Mqtt5Publish.builder()
                 .topic(topic)

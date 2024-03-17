@@ -2,7 +2,9 @@ package online.danielstefani.paddy.mqtt
 
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
 import io.quarkus.logging.Log
+import io.quarkus.runtime.StartupEvent
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.enterprise.event.Observes
 import java.nio.charset.StandardCharsets
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredMemberFunctions
@@ -15,7 +17,7 @@ The point of this class is to extract ACTION and route it to the proper handler.
  */
 @ApplicationScoped
 class MqttTopicRouter(
-    mqttController: MqttController
+    private val mqttController: MqttController
 ) {
     companion object {
         private const val FALLBACK_ACTION = "unhandled"
@@ -25,8 +27,12 @@ class MqttTopicRouter(
 
     // Reflectively get all the functions in the class and add them to the router
     // if they are valid
-    init {
+    fun startup(@Observes event: StartupEvent) {
         mqttController::class.declaredMemberFunctions
+            .onEach { f ->
+                Log.info(f.annotations)
+                Log.info(f.parameters)
+            }
             .also { Log.info("[mqtt->router] Found ${it.size} functions in controller.") }
             .filter { funx ->
                 funx.annotations.map { it::class }.contains(DaemonAction::class) &&

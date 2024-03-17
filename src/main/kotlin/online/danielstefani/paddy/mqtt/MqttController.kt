@@ -1,5 +1,6 @@
 package online.danielstefani.paddy.mqtt
 
+import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
@@ -14,6 +15,6 @@ class MqttController(
 
     @DaemonAction
     fun unhandled(daemonId: String, body: String?) {
-
+        Log.info("Unhandled message received: <$body>")
     }
 }

@@ -6,8 +6,9 @@ import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
 class MqttController(
-    private val rxMqttClient: RxMqttClient
+    private val mqtt: RxMqttClient
 ) {
+
 
     fun readMessage(message: Mqtt5Publish) {
 //        rxMqttClient.publish("device-reads", String(message.payloadAsBytes))

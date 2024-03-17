@@ -28,7 +28,7 @@ import java.util.*
 @ApplicationScoped
 class RxMqttClient(
     private val mqttConfig: MqttConfiguration,
-    private val mqttController: MqttController,
+    private val mqttRouter: MqttTopicRouter,
     @RestClient private val paddyAuth: JwtAuthClient
 ) {
     // Singleton
@@ -104,7 +104,7 @@ class RxMqttClient(
                 // Need to do this because RxJava's
                 // error handling mechanism is futile
                 // Project Reactor >>>>
-                .flatMap { mqttClient!!.applySubscription().toObservable() }
+                .flatMap { mqttClient!!.applySubscription() }
                 .`as` { Flux.from(it.toFlowable(BackpressureStrategy.BUFFER)) }
                 .retryWhen(
                     Retry.fixedDelay(Long.MAX_VALUE, Duration.ofSeconds(5))
@@ -125,8 +125,7 @@ class RxMqttClient(
             .cleanStart(true)
             .applyConnect()
             .doOnSubscribe { Log.info("[client->mqtt] // " +
-                    "Connecting to... ${mqttConfig.host()}:${mqttConfig.port()}")
-            }
+                    "Connecting to... ${mqttConfig.host()}:${mqttConfig.port()}") }
             .doOnSuccess { Log.info("[client->mqtt] // " +
                     "Connected to ${mqttConfig.host()}:${mqttConfig.port()}, ${it.reasonCode}") }
             .doOnError { Log.error("[client->mqtt] // " +
@@ -145,7 +144,7 @@ class RxMqttClient(
     /**
      * Subscribe to the given topics.
      */
-    private fun Mqtt5RxClient.applySubscription(): Flowable<Mqtt5Publish> {
+    private fun Mqtt5RxClient.applySubscription(): Observable<Mqtt5Publish> {
         return this.subscribePublishesWith()
             .addSubscriptions(
                 mqttConfig.getSubscriptions()
@@ -154,19 +153,19 @@ class RxMqttClient(
                             .topicFilter(it)
                             .qos(MqttQos.AT_LEAST_ONCE)
                             .build()
-                    }
-            )
+                    })
             .applySubscribe()
             .doOnSubscribe {
                 Log.info("[client->mqtt] // " + "Subscribing to topics [" +
                         "${mqttConfig.getSubscriptions().joinToString(", ") { "'${it}'" }}]")
             }
-            .doOnNext { mqttController.readMessage(it) }
-            .doOnError { mqttController.readError(it) }
+            .doOnNext { mqttRouter.route(it) }
+            .doOnError { mqttRouter.route(it) }
             .doOnTerminate {
                 Log.info("[client->mqtt] // " +
                         "Connection to ${mqttConfig.host()}:${mqttConfig.port()} ended.")
             }
+            .toObservable()
     }
 
     private fun shutdownClient(): Completable {

@@ -6,7 +6,6 @@ import io.quarkus.runtime.StartupEvent
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.event.Observes
 import java.nio.charset.StandardCharsets
-import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredMemberFunctions
 
 /*
@@ -28,21 +27,18 @@ class MqttTopicRouter(
     // Reflectively get all the functions in the class and add them to the router
     // if they are valid
     fun startup(@Observes event: StartupEvent) {
-        mqttController::class.declaredMemberFunctions
-            .onEach { f ->
-                Log.info(f.parameters)
-                Log.info(f.annotations.map { it::class }.contains(DaemonAction::class))
-                Log.info(f.parameters.size == 2)
-                Log.info(f.parameters[0].type.classifier == String::class)
-            }
+        MqttController::class.declaredMemberFunctions
             .also { Log.info("[mqtt->router] Found ${it.size} functions in controller.") }
             .filter { funx ->
-                funx.annotations.map { it::class }.contains(DaemonAction::class) &&
-                funx.parameters.size == 2 &&
-                funx.parameters[0].type.classifier == String::class &&
-                funx.parameters[1].type.classifier == String::class
+                funx.annotations.map { it.annotationClass }.contains(DaemonAction::class) &&
+                funx.parameters.size == 3 && // There is an extra parameter at parameters[0]
+                funx.parameters[1].type.classifier == String::class &&
+                funx.parameters[2].type.classifier == String::class
             }
-            .also { Log.info("[mqtt->router] Adding ${it.size} valid functions to be routed.") }
+            .also {
+                Log.info("[mqtt->router] Adding ${it.size} " +
+                        "valid functions for routing: ${it.map { f -> f.name }}")
+            }
             .forEach { funx ->
                 val action = (funx.annotations[0] as DaemonAction)
                     .action.ifEmpty { FALLBACK_ACTION }

@@ -55,17 +55,18 @@ class RxMqttClient(
 
     fun publish(
         daemonId: String,
-        message: String
+        message: String = "",
+        qos: MqttQos = MqttQos.AT_MOST_ONCE,
     ): Flowable<Mqtt5PublishResult>? {
         val topic = mqttConfig.deviceReadTopic().replace("+", daemonId)
 
         return mqttClient?.publish(
             Flowable.just(Mqtt5Publish.builder()
                 .topic(topic)
-                .qos(MqttQos.AT_MOST_ONCE)
+                .qos(qos)
                 .payload(message.toByteArray())
                 .build()))
-            ?.doOnComplete { Log.info("[client->mqtt] Successfully published $message to $topic!") }
+            ?.doOnComplete { Log.info("[client->mqtt] Successfully published <$message> to <$topic>!") }
     }
 
     /**
@@ -159,7 +160,12 @@ class RxMqttClient(
                 Log.info("[client->mqtt] // " + "Subscribing to topics [" +
                         "${mqttConfig.getSubscriptions().joinToString(", ") { "'${it}'" }}]")
             }
-            .doOnNext { mqttRouter.route(it) }
+            .doOnNext {
+                // If we didn't send the message - to prevent loops
+                if (it.topic.toString() != mqttConfig.deviceReadTopic()) {
+                    mqttRouter.route(it)
+                }
+            }
             .doOnError { mqttRouter.route(it) }
             .doOnTerminate {
                 Log.info("[client->mqtt] // " +

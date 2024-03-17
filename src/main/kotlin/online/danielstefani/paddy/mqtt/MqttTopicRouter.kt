@@ -42,6 +42,7 @@ class MqttTopicRouter(
             .forEach { funx ->
                 val action = (funx.annotations[0] as DaemonAction)
                     .action.ifEmpty { FALLBACK_ACTION }
+                    .lowercase()
                 router[action] = { args -> funx.call(mqttController, *args) }
             }
     }
@@ -50,7 +51,7 @@ class MqttTopicRouter(
         val actionFunction = if (message.topic.levels.size < 5)
             router[FALLBACK_ACTION]!!
         else
-            (router[message.topic.levels.last()] ?: router[FALLBACK_ACTION])!!
+            (router[message.topic.levels.last().lowercase()] ?: router[FALLBACK_ACTION])!!
 
         actionFunction(arrayOf(
             message.topic.levels[1],

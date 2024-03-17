@@ -1,5 +1,6 @@
 package online.danielstefani.paddy.daemon
 
+import com.hivemq.client.mqtt.datatypes.MqttQos
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.daemon.dto.CreateDaemonResponse
@@ -14,7 +15,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient
 class DaemonService(
     private val daemonRepository: DaemonRepository,
     private val userRepository: UserRepository,
-    private val rxMqttClient: RxMqttClient,
+    private val mqtt: RxMqttClient,
     @RestClient private val paddyAuth: JwtAuthClient
 ) {
     fun getDaemon(daemonId: String): Daemon? {
@@ -47,10 +48,10 @@ class DaemonService(
     fun toggleDaemon(username: String, daemonId: String): Boolean {
         val user = userRepository.get(username)
 
-        daemonRepository.updateUserDaemon(user!!, daemonId)
+        val daemon = daemonRepository.updateUserDaemon(user!!, daemonId)
             { it.on = !it.on } ?: return false
 
-        rxMqttClient.publish("toggle", daemonId)
+        mqtt.publish(daemonId, "toggle", if (daemon.on) "1" else "0", MqttQos.EXACTLY_ONCE)
             ?.subscribe()
 
         return true

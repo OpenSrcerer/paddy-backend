@@ -14,7 +14,7 @@ class MqttController(
     fun ping(daemonId: String, body: String?) {
         val on = daemonService.getDaemon(daemonId)?.on ?: return
 
-        mqtt.publish(daemonId, if (on) "1" else "0", MqttQos.EXACTLY_ONCE)
+        mqtt.publish(daemonId, "toggle", if (on) "1" else "0", MqttQos.EXACTLY_ONCE)
             ?.subscribe()
     }
 

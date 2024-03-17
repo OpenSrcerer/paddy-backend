@@ -55,6 +55,7 @@ class RxMqttClient(
 
     fun publish(
         daemonId: String,
+        action: String,
         message: String = "",
         qos: MqttQos = MqttQos.AT_MOST_ONCE,
     ): Flowable<Mqtt5PublishResult>? {
@@ -162,7 +163,7 @@ class RxMqttClient(
             }
             .doOnNext {
                 // If we didn't send the message - to prevent loops
-                if (it.topic.toString() != mqttConfig.deviceReadTopic()) {
+                if (it.topic.toString().startsWith(mqttConfig.deviceReadTopic())) {
                     mqttRouter.route(it)
                 }
             }

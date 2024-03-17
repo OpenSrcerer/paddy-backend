@@ -42,11 +42,13 @@ class DaemonService(
 
     fun toggleDaemon(username: String, daemonId: String): Boolean {
         val user = userRepository.get(username)
-        val daemon = daemonRepository.getUserDaemon(user!!, daemonId)
-            ?: return false
+
+        daemonRepository.updateUserDaemon(user!!, daemonId)
+            { it.on = !it.on } ?: return false
 
         rxMqttClient.publish("toggle", daemonId)
             ?.subscribe()
+
         return true
     }
 }

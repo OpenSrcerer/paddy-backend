@@ -19,7 +19,19 @@ class DaemonRepository : AbstractNeo4jRepository() {
         }
     }
 
+    fun updateUserDaemon(
+        user: User,
+        id: String,
+        updater: (Daemon) -> Unit
+    ): Daemon? {
+        with(neo4j.openSession()) {
+            return getUserDaemon(user, id)?.also {
+                updater.invoke(it)
 
+                this.save(it)
+            }
+        }
+    }
 
     fun getUserDaemon(user: User, id: String): Daemon? {
         return with(neo4j.openSession()) {
@@ -32,7 +44,6 @@ class DaemonRepository : AbstractNeo4jRepository() {
                 """, emptyMap<String, String>())
         }
     }
-
 
     fun getAllUserDaemons(user: User): List<Daemon> {
         return with(neo4j.openSession()) {

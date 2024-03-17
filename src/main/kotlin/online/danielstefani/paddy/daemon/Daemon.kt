@@ -19,6 +19,8 @@ open class Daemon() {
     @Id
     var id: String? = null
 
+    var on: Boolean = false
+
     @JsonIgnore
     @Relationship(type = "OWNS", direction = Relationship.Direction.INCOMING)
     var user: User? = null

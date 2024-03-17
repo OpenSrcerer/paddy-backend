@@ -17,6 +17,10 @@ class DaemonService(
     private val rxMqttClient: RxMqttClient,
     @RestClient private val paddyAuth: JwtAuthClient
 ) {
+    fun getDaemon(daemonId: String): Daemon? {
+        return daemonRepository.get(daemonId)
+    }
+
     fun getAllUserDaemons(username: String): List<Daemon> {
         val user = userRepository.get(username)
         return daemonRepository.getAllUserDaemons(user!!)

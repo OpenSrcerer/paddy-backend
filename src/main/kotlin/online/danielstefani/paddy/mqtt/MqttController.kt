@@ -2,14 +2,18 @@ package online.danielstefani.paddy.mqtt
 
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
+import online.danielstefani.paddy.daemon.DaemonService
 
 @ApplicationScoped
 class MqttController(
-    private val mqtt: RxMqttClient
+    private val mqtt: RxMqttClient,
+    private val daemonService: DaemonService
 ) {
-    @DaemonAction("hello")
+    @DaemonAction("ping")
     fun hello(daemonId: String, body: String?) {
-        mqtt.publish(daemonId, "hello back!")
+        val on = daemonService.getDaemon(daemonId)?.on ?: return
+
+        mqtt.publish(daemonId, if (on) "1" else "0")
             ?.subscribe()
     }
 

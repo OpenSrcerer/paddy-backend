@@ -1,5 +1,6 @@
 package online.danielstefani.paddy.mqtt
 
+import com.hivemq.client.mqtt.datatypes.MqttQos
 import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.daemon.DaemonService
@@ -13,7 +14,7 @@ class MqttController(
     fun ping(daemonId: String, body: String?) {
         val on = daemonService.getDaemon(daemonId)?.on ?: return
 
-        mqtt.publish(daemonId, if (on) "1" else "0")
+        mqtt.publish(daemonId, if (on) "1" else "0", MqttQos.EXACTLY_ONCE)
             ?.subscribe()
     }
 

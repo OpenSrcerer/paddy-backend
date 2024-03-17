@@ -22,7 +22,7 @@ class MqttTopicRouter(
         private const val FALLBACK_ACTION = "unhandled"
     }
 
-    private val router: HashMap<String, (args: Array<Any>) -> Unit> = HashMap()
+    private val router: HashMap<String, (args: Array<Any?>) -> Unit> = HashMap()
 
     // Reflectively get all the functions in the class and add them to the router
     // if they are valid
@@ -55,11 +55,14 @@ class MqttTopicRouter(
 
         actionFunction(arrayOf(
             message.topic.levels[1],
-            message.payload.map { StandardCharsets.UTF_8.decode(it).toString() }
-                .orElse(null)))
+            message.payload.let { payload ->
+                if (payload.isPresent) payload.map { StandardCharsets.UTF_8.decode(it).toString() }.get()
+                else null
+            }
+        ))
     }
 
     fun route(throwable: Throwable) {
-        Log.error("[mqtt->router] Error while ingesting MQTT Message:", throwable)
+        Log.error("[mqtt->router] Error while ingesting MQTT Message", throwable)
     }
 }

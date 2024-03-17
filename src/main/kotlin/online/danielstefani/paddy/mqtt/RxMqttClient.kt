@@ -59,7 +59,7 @@ class RxMqttClient(
         message: String = "",
         qos: MqttQos = MqttQos.AT_MOST_ONCE,
     ): Flowable<Mqtt5PublishResult>? {
-        val topic = mqttConfig.deviceReadTopic().replace("+", daemonId)
+        val topic = mqttConfig.deviceReadTopic().replace("+", daemonId) + "/$action"
 
         return mqttClient?.publish(
             Flowable.just(Mqtt5Publish.builder()

@@ -30,8 +30,10 @@ class MqttTopicRouter(
     fun startup(@Observes event: StartupEvent) {
         mqttController::class.declaredMemberFunctions
             .onEach { f ->
-                Log.info(f.annotations)
-                Log.info(f.parameters)
+                Log.info(f.annotations.map { it::class }.contains(DaemonAction::class))
+                Log.info(f.parameters.size == 2)
+                Log.info(f.parameters[0].type.classifier == String::class)
+                Log.info(f.parameters[1].type.classifier == String::class)
             }
             .also { Log.info("[mqtt->router] Found ${it.size} functions in controller.") }
             .filter { funx ->

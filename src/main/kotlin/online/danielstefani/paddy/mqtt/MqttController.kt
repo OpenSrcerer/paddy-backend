@@ -1,21 +1,19 @@
 package online.danielstefani.paddy.mqtt
 
-import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
-import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 
 @ApplicationScoped
 class MqttController(
     private val mqtt: RxMqttClient
 ) {
-
-
-    fun readMessage(message: Mqtt5Publish) {
-//        rxMqttClient.publish("device-reads", String(message.payloadAsBytes))
-//            ?.subscribe()
+    @DaemonAction("hello")
+    fun hello(daemonId: String, body: String?) {
+        mqtt.publish(daemonId, "hello back!")
+            ?.subscribe()
     }
 
-    fun readError(error: Throwable) {
-        Log.error(error)
+    @DaemonAction
+    fun unhandled(daemonId: String, body: String?) {
+
     }
 }

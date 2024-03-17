@@ -15,7 +15,7 @@ interface MqttConfiguration {
     @WithDefault("paddy-backend")
     fun clientId(): String
 
-    @WithDefault("daemon/v1/reads")
+    @WithDefault("daemon/+/v1/reads")
     fun deviceReadTopic(): String
 
     // ---- Meta ----

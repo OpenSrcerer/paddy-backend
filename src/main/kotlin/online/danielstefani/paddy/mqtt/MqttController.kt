@@ -10,7 +10,7 @@ class MqttController(
     private val daemonService: DaemonService
 ) {
     @DaemonAction("ping")
-    fun hello(daemonId: String, body: String?) {
+    fun ping(daemonId: String, body: String?) {
         val on = daemonService.getDaemon(daemonId)?.on ?: return
 
         mqtt.publish(daemonId, if (on) "1" else "0")

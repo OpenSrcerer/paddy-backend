@@ -60,6 +60,6 @@ class MqttTopicRouter(
     }
 
     fun route(throwable: Throwable) {
-
+        Log.error("[mqtt->router] Error while ingesting MQTT Message:", throwable)
     }
 }

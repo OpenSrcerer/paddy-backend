@@ -162,8 +162,8 @@ class RxMqttClient(
                         "${mqttConfig.getSubscriptions().joinToString(", ") { "'${it}'" }}]")
             }
             .doOnNext {
-                // If we didn't send the message - to prevent loops
-                if (it.topic.toString().startsWith(mqttConfig.deviceReadTopic())) {
+                // Route only if we didn't send the message - to prevent loops
+                if (!it.topic.toString().startsWith(mqttConfig.deviceReadTopic())) {
                     mqttRouter.route(it)
                 }
             }

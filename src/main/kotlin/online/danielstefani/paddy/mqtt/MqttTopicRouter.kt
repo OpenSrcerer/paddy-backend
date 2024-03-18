@@ -59,13 +59,17 @@ class MqttTopicRouter(
         else
             (router[message.topic.levels.last().lowercase()] ?: router[FALLBACK_ACTION])!!
 
-        actionFunction(arrayOf(
-            message.topic.levels[1],
-            message.payload.let { payload ->
-                if (payload.isPresent) payload.map { StandardCharsets.UTF_8.decode(it).toString() }.get()
-                else null
-            }
-        ))
+        val daemonId = message.topic.levels[1]
+        val payload = message.payload.let { payload ->
+            if (payload.isPresent) payload.map { StandardCharsets.UTF_8.decode(it).toString() }.get()
+            else null
+        }
+
+        try {
+            actionFunction(arrayOf(daemonId, payload))
+        } catch (ex: Exception) {
+            route(ex)
+        }
     }
 
     fun route(throwable: Throwable) {

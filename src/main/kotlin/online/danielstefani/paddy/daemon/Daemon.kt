@@ -9,17 +9,19 @@ import org.neo4j.ogm.annotation.Relationship
 @NodeEntity
 open class Daemon() {
 
-    constructor(
-        daemon: Daemon
-    ) : this() {
+    // Copy constructor
+    constructor(daemon: Daemon) : this() {
         this.id = daemon.id
         this.user = daemon.user
+        this.lastPing = daemon.lastPing
     }
 
     @Id
     var id: String? = null
 
     var on: Boolean = false
+
+    var lastPing: Long = 0
 
     @JsonIgnore
     @Relationship(type = "OWNS", direction = Relationship.Direction.INCOMING)

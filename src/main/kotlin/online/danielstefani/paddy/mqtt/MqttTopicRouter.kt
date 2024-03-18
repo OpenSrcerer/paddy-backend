@@ -4,6 +4,7 @@ import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
 import io.quarkus.logging.Log
 import io.quarkus.runtime.StartupEvent
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.enterprise.context.control.ActivateRequestContext
 import jakarta.enterprise.event.Observes
 import java.nio.charset.StandardCharsets
 import kotlin.reflect.full.declaredMemberFunctions
@@ -47,6 +48,11 @@ class MqttTopicRouter(
             }
     }
 
+    /*
+    Request context needs to be activated in order to retrieve a
+    request-scoped Neo4j session.
+     */
+    @ActivateRequestContext
     fun route(message: Mqtt5Publish) {
         val actionFunction = if (message.topic.levels.size < 5)
             router[FALLBACK_ACTION]!!

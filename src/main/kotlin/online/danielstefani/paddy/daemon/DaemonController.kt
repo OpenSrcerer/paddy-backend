@@ -23,8 +23,8 @@ class DaemonController(
 
     @GET
     @Path("/{id}")
-    fun getDaemon(@RestPath id: String): String {
-        return ":) Not Implemented Yet"
+    fun getUserDaemon(@RestPath id: String): Daemon? {
+        return daemonService.getDaemon(id, securityIdentity.username())
     }
 
     @GET

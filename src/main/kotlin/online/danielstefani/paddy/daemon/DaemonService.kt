@@ -18,7 +18,11 @@ class DaemonService(
     private val mqtt: RxMqttClient,
     @RestClient private val paddyAuth: JwtAuthClient
 ) {
-    fun getDaemon(daemonId: String): Daemon? {
+    fun getDaemon(daemonId: String, username: String? = null): Daemon? {
+        if (username != null) {
+            val user = userRepository.get(username) ?: return null
+            return daemonRepository.get(daemonId, user)
+        }
         return daemonRepository.get(daemonId)
     }
 

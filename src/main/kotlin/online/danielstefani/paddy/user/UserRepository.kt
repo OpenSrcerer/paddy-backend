@@ -2,11 +2,14 @@ package online.danielstefani.paddy.user
 
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.repository.AbstractNeo4jRepository
+import online.danielstefani.paddy.repository.RequestScopedNeo4jSession
 import org.neo4j.ogm.session.queryForObject
 import java.util.*
 
 @ApplicationScoped
-class UserRepository : AbstractNeo4jRepository() {
+class UserRepository(
+    private val session: RequestScopedNeo4jSession
+) : AbstractNeo4jRepository() {
 
     /*
     Email & Username takes the same value if one
@@ -14,15 +17,13 @@ class UserRepository : AbstractNeo4jRepository() {
     could be email or username and that's logical.
      */
     fun get(email: String, username: String = email): User? {
-        return with(neo4j.openSession()) {
-            this.queryForObject<User>(
-                """
-                    MATCH (node:User)
-                    WHERE (node.email = "$email" 
-                        OR node.username = "$username")
-                    RETURN node
-                """, emptyMap())
-        }
+        return session().queryForObject<User>(
+            """
+                MATCH (node:User)
+                WHERE (node.email = "$email" 
+                    OR node.username = "$username")
+                RETURN node
+            """, emptyMap())
     }
 
     fun create(
@@ -31,18 +32,16 @@ class UserRepository : AbstractNeo4jRepository() {
         passwordHash: String,
         passwordSalt: String
     ): User? {
-        return with(neo4j.openSession()) {
-            if (get(email, username) != null) null
-            else User()
-                .also {
-                    it.id = UUID.randomUUID().toString()
-                    it.email = email
-                    it.username = username
-                    it.passwordHash = passwordHash
-                    it.passwordSalt = passwordSalt
+        return if (get(email, username) != null) null
+        else User()
+            .also {
+                it.id = UUID.randomUUID().toString()
+                it.email = email
+                it.username = username
+                it.passwordHash = passwordHash
+                it.passwordSalt = passwordSalt
 
-                    this.save(it)
-                }
-        }
+                session().save(it)
+            }
     }
 }

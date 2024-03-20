@@ -12,7 +12,7 @@ import jakarta.enterprise.inject.Alternative
 @Alternative
 @Priority(1)
 @ApplicationScoped
-class PaddyHttpIdentityProvider : IdentityProvider<TokenAuthenticationRequest> {
+class HttpIdentityProvider : IdentityProvider<TokenAuthenticationRequest> {
 
     override fun getRequestType(): Class<TokenAuthenticationRequest> {
         return TokenAuthenticationRequest::class.java

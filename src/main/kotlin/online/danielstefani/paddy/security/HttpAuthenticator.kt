@@ -24,7 +24,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient
 @Alternative
 @Priority(1)
 @ApplicationScoped
-class PaddyHttpAuthenticator(
+class HttpAuthenticator(
     @RestClient private val paddyAuth: JwtAuthClient
 ) : HttpAuthenticationMechanism {
 

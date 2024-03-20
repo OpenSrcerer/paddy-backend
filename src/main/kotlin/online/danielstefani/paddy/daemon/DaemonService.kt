@@ -18,11 +18,7 @@ class DaemonService(
     private val mqtt: RxMqttClient,
     @RestClient private val paddyAuth: JwtAuthClient
 ) {
-    fun getDaemon(daemonId: String, username: String? = null): Daemon? {
-        if (username != null) {
-            val user = userRepository.get(username) ?: return null
-            return daemonRepository.get(daemonId, user)
-        }
+    fun getDaemon(daemonId: String): Daemon? {
         return daemonRepository.get(daemonId)
     }
 
@@ -34,7 +30,9 @@ class DaemonService(
     fun createDaemon(username: String, daemonId: Long): Uni<CreateDaemonResponse?> {
         val user = userRepository.get(username)
 
-        val daemonUni = Uni.createFrom().item { daemonRepository.createUserDaemon("$daemonId", user!!) }
+        val daemonUni = Uni.createFrom().emitter<Daemon> {
+            it.complete(daemonRepository.createUserDaemon("$daemonId", user!!))
+        }
         val jwtUni = paddyAuth.generateJwt(JwtRequestDto("$daemonId", JwtType.DAEMON))
 
         return Uni.combine().all().unis(daemonUni, jwtUni)
@@ -44,15 +42,12 @@ class DaemonService(
             }
     }
 
-    fun deleteDaemon(username: String, daemonId: String): Daemon? {
-        val user = userRepository.get(username)
-        return daemonRepository.deleteUserDaemon(daemonId, user!!)
+    fun deleteDaemon(daemonId: String): Daemon? {
+        return daemonRepository.deleteUserDaemon(daemonId)
     }
 
-    fun toggleDaemon(username: String, daemonId: String): Boolean {
-        val user = userRepository.get(username)
-
-        val daemon = daemonRepository.update(daemonId, user!!)
+    fun toggleDaemon(daemonId: String): Boolean {
+        val daemon = daemonRepository.update(daemonId)
             { it.on = !it.on } ?: return false
 
         mqtt.publish(daemonId, "toggle", if (daemon.on) "1" else "0", MqttQos.EXACTLY_ONCE)

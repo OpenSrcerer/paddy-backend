@@ -12,18 +12,10 @@ class DaemonRepository(
     private val session: RequestScopedNeo4jSession
 ) : AbstractNeo4jRepository() {
 
-    fun get(id: String, user: User? = null): Daemon? {
-        val query = if (user == null)
-            """
+    fun get(id: String, username: String? = null): Daemon? {
+        val query = """
                     MATCH (node:Daemon { id: "$id" })
                     RETURN node
-                """
-        else
-            """
-                    MATCH (ux:User { username: "${user.username}" })
-                        -[:OWNS]-> (dx:Daemon)
-                    WHERE dx.id = "$id"
-                    RETURN dx
                 """
 
         return session().queryForObject<Daemon>(query, emptyMap())
@@ -31,10 +23,9 @@ class DaemonRepository(
 
     fun update(
         id: String,
-        user: User? = null,
         updater: (Daemon) -> Unit
     ): Daemon? {
-        return get(id, user)?.also {
+        return get(id)?.also {
             updater.invoke(it)
 
             session().save(it)
@@ -64,8 +55,8 @@ class DaemonRepository(
         }
     }
 
-    fun deleteUserDaemon(id: String, user: User): Daemon? {
-        return get(id, user)
+    fun deleteUserDaemon(id: String): Daemon? {
+        return get(id)
             ?.also { session().delete(it) }
     }
 }

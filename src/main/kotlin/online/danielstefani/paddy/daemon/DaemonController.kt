@@ -1,5 +1,6 @@
 package online.danielstefani.paddy.daemon
 
+import io.quarkus.logging.Log
 import io.quarkus.security.Authenticated
 import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
@@ -22,9 +23,9 @@ class DaemonController(
 ) {
 
     @GET
-    @Path("/{id}")
+    @Path("/{id:\\d+}")
     fun getUserDaemon(@RestPath id: String): Daemon? {
-        return daemonService.getDaemon(id, securityIdentity.username())
+        return daemonService.getDaemon(id)
     }
 
     @GET
@@ -33,9 +34,8 @@ class DaemonController(
     }
 
     @POST
-    @Path("/{id}")
-    fun postDaemon(@RestPath id: String): Uni<RestResponse<CreateDaemonResponse?>> {
-        val daemonId = try { id.toLong() } catch (e: NumberFormatException) {
+    fun postDaemon(daemon: Daemon): Uni<RestResponse<CreateDaemonResponse?>> {
+        val daemonId = try { (daemon.id ?: "x").toLong() } catch (e: NumberFormatException) {
             return Uni.createFrom().item(status(Response.Status.BAD_REQUEST))
         }
 
@@ -47,29 +47,29 @@ class DaemonController(
     }
 
     @PATCH
-    @Path("/{id}")
+    @Path("/{id:\\d+}")
     fun patchDaemon(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }
 
     @DELETE
-    @Path("/{id}")
+    @Path("/{id:\\d+}")
     fun deleteDaemon(@RestPath id: String): RestResponse<Daemon> {
-        return daemonService.deleteDaemon(securityIdentity.username(), id)
+        return daemonService.deleteDaemon(id)
             ?.let { ResponseBuilder.ok(it).build() }
             ?: status(Response.Status.NOT_FOUND)
     }
 
     @PATCH
-    @Path("/{id}/toggle")
+    @Path("/{id:\\d+}/toggle")
     fun toggleDaemon(@RestPath id: String): RestResponse<Unit> {
-        return if (daemonService.toggleDaemon(securityIdentity.username(), id)) ok()
+        return if (daemonService.toggleDaemon(id)) ok()
         else notFound()
     }
 
     // ---- Statistics ----
     @GET
-    @Path("/{id}/statistic")
+    @Path("/{id:\\d+}/statistic")
     fun getDaemonStatistic(@RestPath id: String): String {
         return ":) Not Implemented Yet"
     }

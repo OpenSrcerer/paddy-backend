@@ -1,9 +1,10 @@
 package online.danielstefani.paddy.daemon
 
-import io.quarkus.logging.Log
 import io.quarkus.security.Authenticated
 import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotNull
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
@@ -23,9 +24,11 @@ class DaemonController(
 ) {
 
     @GET
-    @Path("/{id:\\d+}")
-    fun getUserDaemon(@RestPath id: String): Daemon? {
-        return daemonService.getDaemon(id)
+    @Path("/{id}")
+    fun getUserDaemon(@RestPath id: Long): RestResponse<Daemon?> {
+        return daemonService.getDaemon(id.toString())
+            ?.let { ok(it) }
+            ?: status(Response.Status.NOT_FOUND)
     }
 
     @GET
@@ -34,12 +37,10 @@ class DaemonController(
     }
 
     @POST
-    fun postDaemon(daemon: Daemon): Uni<RestResponse<CreateDaemonResponse?>> {
-        val daemonId = try { (daemon.id ?: "x").toLong() } catch (e: NumberFormatException) {
-            return Uni.createFrom().item(status(Response.Status.BAD_REQUEST))
-        }
-
-        return daemonService.createDaemon(securityIdentity.username(), daemonId)
+    fun postDaemon(
+        @NotNull @Valid daemon: Daemon
+    ): Uni<RestResponse<CreateDaemonResponse?>> {
+        return daemonService.createDaemon(securityIdentity.username(), daemon.id!!.toLong())
             .map {
                 if (it != null) ResponseBuilder.ok(it).build()
                 else status(Response.Status.CONFLICT)
@@ -47,37 +48,24 @@ class DaemonController(
     }
 
     @PATCH
-    @Path("/{id:\\d+}")
-    fun patchDaemon(@RestPath id: String): String {
+    @Path("/{id}")
+    fun patchDaemon(@RestPath id: Long): String {
         return ":) Not Implemented Yet"
     }
 
     @DELETE
-    @Path("/{id:\\d+}")
-    fun deleteDaemon(@RestPath id: String): RestResponse<Daemon> {
-        return daemonService.deleteDaemon(id)
-            ?.let { ResponseBuilder.ok(it).build() }
+    @Path("/{id}")
+    fun deleteDaemon(@RestPath id: Long): RestResponse<Daemon> {
+        return daemonService.deleteDaemon(id.toString())
+            ?.let { ok(it) }
             ?: status(Response.Status.NOT_FOUND)
     }
 
     @PATCH
-    @Path("/{id:\\d+}/toggle")
-    fun toggleDaemon(@RestPath id: String): RestResponse<Unit> {
-        return if (daemonService.toggleDaemon(id)) ok()
+    @Path("/{id}/toggle")
+    fun toggleDaemon(@RestPath id: Long): RestResponse<Unit> {
+        return if (daemonService.toggleDaemon(id.toString())) ok()
         else notFound()
-    }
-
-    // ---- Statistics ----
-    @GET
-    @Path("/{id:\\d+}/statistic")
-    fun getDaemonStatistic(@RestPath id: String): String {
-        return ":) Not Implemented Yet"
-    }
-
-    @PUT
-    @Path("/{id}/statistic")
-    fun putDaemonStatistic(@RestPath id: String): String {
-        return ":) Not Implemented Yet"
     }
 }
 

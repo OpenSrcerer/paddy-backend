@@ -18,13 +18,13 @@ class RequestScopedNeo4jSession(
     private fun get(): Session {
         return session ?: sessionFactory.get().also {
             session = it
-            Log.info("[neo4j->session] Opened <$session>...")
+            Log.debug("[neo4j->session] Opened <$session>...")
         }
     }
 
     @PreDestroy
     internal fun onDestroy() {
-        Log.info("[neo4j->session] Destroying session <$session>...")
+        Log.debug("[neo4j->session] Destroying session <$session>...")
         session?.clear()
     }
 }

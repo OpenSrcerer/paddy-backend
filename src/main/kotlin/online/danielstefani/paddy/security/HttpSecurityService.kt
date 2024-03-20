@@ -10,6 +10,5 @@ class HttpSecurityService(
     fun hasAccessToDaemon(username: String, daemonId: String): Uni<Boolean> {
         return securityRepository.getUserDaemon(username, daemonId)
             .map { it != null }
-            .log()
     }
 }

@@ -57,6 +57,11 @@ class HttpAuthorizer(
             return Uni.createFrom().item(true)
         }
 
+        // splitPath[1] should be daemonId, try to parse as number
+        try { splitPath[1].toLong() } catch (ex: NumberFormatException) {
+            return Uni.createFrom().item(false)
+        }
+
         return identity
             .flatMap {
                 if (it != null) securityService.hasAccessToDaemon(it.username(), splitPath[1])

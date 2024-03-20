@@ -1,6 +1,5 @@
 package online.danielstefani.paddy.user
 
-import io.quarkus.security.identity.SecurityIdentity
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
@@ -16,9 +15,7 @@ import org.jboss.resteasy.reactive.RestResponse
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 class UserController(
-    private val userRepository: UserRepository,
-    private val userService: UserService,
-    private val securityIdentity: SecurityIdentity
+    private val userRepository: UserRepository
 ) {
     /*
     Hash the given password hash with a salt, the signup the user.

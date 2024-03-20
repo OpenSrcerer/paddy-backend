@@ -29,6 +29,9 @@ dependencies {
     // HiveMQ MQTT Client
     implementation("com.hivemq:hivemq-mqtt-client-reactor:1.3.3")
 
+    // Validation
+    implementation("io.quarkus:quarkus-hibernate-validator") // Jakarta
+
     // Reactive REST
     implementation("io.quarkus:quarkus-rest-client-reactive-jackson")
     implementation("io.quarkus:quarkus-resteasy-reactive-jackson")

@@ -1,6 +1,9 @@
 package online.danielstefani.paddy.daemon
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
+import online.danielstefani.paddy.schedule.Schedule
 import online.danielstefani.paddy.user.User
 import org.neo4j.ogm.annotation.Id
 import org.neo4j.ogm.annotation.NodeEntity
@@ -16,7 +19,7 @@ open class Daemon() {
         this.lastPing = daemon.lastPing
     }
 
-    @Id
+    @Id @NotNull @Pattern(regexp = "\\d+")
     var id: String? = null
 
     var on: Boolean = false
@@ -26,4 +29,8 @@ open class Daemon() {
     @JsonIgnore
     @Relationship(type = "OWNS", direction = Relationship.Direction.INCOMING)
     var user: User? = null
+
+    @JsonIgnore
+    @Relationship(type = "IS_SCHEDULED", direction = Relationship.Direction.OUTGOING)
+    var schedules = setOf<Schedule>()
 }

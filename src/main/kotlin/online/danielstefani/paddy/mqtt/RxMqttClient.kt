@@ -31,8 +31,7 @@ class RxMqttClient(
     private val mqttRouter: MqttTopicRouter,
     @RestClient private val paddyAuth: JwtAuthClient
 ) {
-    // Singleton
-    private var mqttClient: Mqtt5RxClient? = null
+    private var mqttClient: Mqtt5RxClient? = null // Singleton
     private val mqttClientId = UUID.randomUUID()
 
     private var jwtUsername: String? = null
@@ -53,6 +52,14 @@ class RxMqttClient(
             }
     }
 
+    fun publish(scheduleId: String): Flowable<Mqtt5PublishResult>? {
+        val topic = mqttConfig.schedulerEvents()
+            .replace("\$share/backend-cluster/", "")
+            .replace("+", scheduleId)
+
+        return publish(topic, "", MqttQos.EXACTLY_ONCE)
+    }
+
     fun publish(
         daemonId: String,
         action: String,
@@ -61,6 +68,19 @@ class RxMqttClient(
     ): Flowable<Mqtt5PublishResult>? {
         val topic = mqttConfig.deviceReadTopic().replace("+", daemonId) + "/$action"
 
+        return publish(topic, message, qos)
+    }
+
+    // Further research on this:
+    // There is a possibility that these calls can happen without
+    // the application being loaded first, which can lead to publishes
+    // being lost. This needs to be checked at some point.
+    // So far it seems that it's not the case, but just to be sure.
+    fun publish(
+        topic: String,
+        message: String,
+        qos: MqttQos
+    ): Flowable<Mqtt5PublishResult>? {
         return mqttClient?.publish(
             Flowable.just(Mqtt5Publish.builder()
                 .topic(topic)

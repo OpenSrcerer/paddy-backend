@@ -18,6 +18,9 @@ interface MqttConfiguration {
     @WithDefault("daemon/+/v1/reads")
     fun deviceReadTopic(): String
 
+    @WithDefault("schedule/+")
+    fun schedulerEvents(): String
+
     // ---- Meta ----
     fun subscriptions(): String
 

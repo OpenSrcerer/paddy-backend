@@ -1,16 +1,12 @@
 package online.danielstefani.paddy.schedule
 
-import com.cronutils.model.CronType
-import com.cronutils.model.definition.CronDefinitionBuilder
-import com.cronutils.parser.CronParser
-import com.cronutils.validation.CronValidator
-import io.quarkus.logging.Log
 import io.quarkus.security.Authenticated
 import io.quarkus.security.identity.SecurityIdentity
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotNull
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
+import online.danielstefani.paddy.mqtt.RxMqttClient
 import online.danielstefani.paddy.util.username
 import org.jboss.resteasy.reactive.RestPath
 import org.jboss.resteasy.reactive.RestResponse
@@ -23,7 +19,8 @@ import org.jboss.resteasy.reactive.RestResponse.*
 class ScheduleController(
     private val securityIdentity: SecurityIdentity,
     private val scheduleService: ScheduleService,
-    private val scheduleRepository: ScheduleRepository
+    private val scheduleRepository: ScheduleRepository,
+    private val mqttClient: RxMqttClient
 ) {
 
     @GET
@@ -52,7 +49,10 @@ class ScheduleController(
         }
 
         return scheduleService.createSchedule(daemonId.toString(), schedule)
-            ?.let { ok(it) }
+            ?.let {
+                mqttClient.publish(it.id.toString())?.subscribe()
+                ok(it)
+            }
             ?: notFound()
     }
 
@@ -70,6 +70,8 @@ class ScheduleController(
             it.periodic = (schedule.periodic ?: it.periodic)
             it.finish = (schedule.finish ?: it.finish)
             it.timezone = (schedule.timezone ?: it.timezone)
+        }?.also {
+            mqttClient.publish(it.id.toString())?.subscribe()
         }
 
         return if (updatedSchedule != null) ok(updatedSchedule)
@@ -83,7 +85,10 @@ class ScheduleController(
         @RestPath daemonId: Long,
     ): RestResponse<Schedule?> {
         return scheduleRepository.delete(id, daemonId.toString())
-            ?.let { ok(it) }
+            ?.let {
+                mqttClient.publish(it.id.toString())?.subscribe()
+                ok(it)
+            }
             ?: notFound()
     }
 

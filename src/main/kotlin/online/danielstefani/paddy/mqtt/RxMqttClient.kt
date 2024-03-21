@@ -54,7 +54,7 @@ class RxMqttClient(
 
     fun publish(scheduleId: String): Flowable<Mqtt5PublishResult>? {
         val topic = mqttConfig.schedulerEvents()
-            .replace("\$share/backend-cluster/", "")
+            .replace("\$share/scheduler-cluster/", "")
             .replace("+", scheduleId)
 
         return publish(topic, "", MqttQos.EXACTLY_ONCE)

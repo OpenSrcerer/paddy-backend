@@ -1,4 +1,4 @@
-package online.danielstefani.paddy.schedule.quartz
+package online.danielstefani.paddy.schedule.validation
 
 import jakarta.validation.Constraint
 import jakarta.validation.Payload

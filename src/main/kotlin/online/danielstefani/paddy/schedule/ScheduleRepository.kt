@@ -1,6 +1,5 @@
 package online.danielstefani.paddy.schedule
 
-import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.daemon.Daemon
 import online.danielstefani.paddy.repository.AbstractNeo4jRepository
@@ -65,7 +64,6 @@ class ScheduleRepository(
     fun delete(id: Long, daemonId: String? = null): Schedule? {
         return get(id, daemonId)
             ?.also {
-                Log.info(it)
                 session().delete(it)
             }
     }

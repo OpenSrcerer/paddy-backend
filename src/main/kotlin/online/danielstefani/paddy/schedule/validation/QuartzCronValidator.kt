@@ -1,4 +1,4 @@
-package online.danielstefani.paddy.schedule.quartz
+package online.danielstefani.paddy.schedule.validation
 
 import com.cronutils.model.CronType
 import com.cronutils.model.definition.CronDefinitionBuilder

@@ -1,12 +1,11 @@
 package online.danielstefani.paddy.schedule
 
-import com.cronutils.model.CronType
-import com.cronutils.validation.Cron
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.annotation.Nullable
 import jakarta.validation.constraints.NotNull
 import online.danielstefani.paddy.daemon.Daemon
-import online.danielstefani.paddy.schedule.quartz.QuartzCron
+import online.danielstefani.paddy.schedule.validation.QuartzCron
+import online.danielstefani.paddy.schedule.validation.Timezone
 import org.neo4j.ogm.annotation.GeneratedValue
 import org.neo4j.ogm.annotation.Id
 import org.neo4j.ogm.annotation.NodeEntity
@@ -24,14 +23,20 @@ open class Schedule {
     @NotNull
     var type: ScheduleType? = null
 
+    @Timezone
     var timezone = TimeZone.getTimeZone("UTC").toZoneId().id
 
     // Signifies that this Schedule will run only once.
+    // Execution time in UNIX seconds
     var single: Long? = null
 
     // Signifies that this Schedule will run periodically.
     @QuartzCron
+    @Nullable
     var periodic: String? = null
+
+    // The last time this Schedule was executed
+    var lastExecution: Long? = null
 
     // Signifies that this Schedule will finish running at some point.
     // If null, this Schedule runs indefinitely.

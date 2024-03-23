@@ -35,8 +35,8 @@ open class Schedule {
     @QuartzCron
     var periodic: String? = null
 
-    // The last time this Schedule was executed
-    var lastExecution: Long? = null
+    // The next time this Schedule will be executed
+    var nextExecution: Long? = null
 
     // Signifies that this Schedule will finish running at some point.
     // If null, this Schedule runs indefinitely.

@@ -76,7 +76,7 @@ class RxMqttClient(
     // the application being loaded first, which can lead to publishes
     // being lost. This needs to be checked at some point.
     // So far it seems that it's not the case, but just to be sure.
-    fun publish(
+    private fun publish(
         topic: String,
         message: String,
         qos: MqttQos

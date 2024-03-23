@@ -21,7 +21,7 @@ class MqttController(
             it.lastPing = Instant.now().epochSecond
         }
 
-        mqtt.publish(daemonId, if (on) "on" else "off", qos = MqttQos.EXACTLY_ONCE)
+        mqtt.publish(daemonId, action = if (on) "on" else "off", qos = MqttQos.EXACTLY_ONCE)
             ?.subscribe()
     }
 

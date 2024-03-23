@@ -56,7 +56,7 @@ class DaemonService(
         schedules.map { mqtt.publish(it.id!!.toString()) }
             .let { Flowable.concat(it) }
             // Also turn the device off
-            .concatWith(mqtt.publish(daemonId, "off", qos = MqttQos.EXACTLY_ONCE))
+            .concatWith(mqtt.publish(daemonId, action = "off", qos = MqttQos.EXACTLY_ONCE))
             .subscribe()
 
         // Delete the daemon itself
@@ -67,7 +67,7 @@ class DaemonService(
         daemonRepository.update(daemonId)
             { it.on = !it.on } ?: return false
 
-        mqtt.publish(daemonId, "toggle", qos = MqttQos.EXACTLY_ONCE)
+        mqtt.publish(daemonId, action = "toggle", qos = MqttQos.EXACTLY_ONCE)
             ?.subscribe()
 
         return true

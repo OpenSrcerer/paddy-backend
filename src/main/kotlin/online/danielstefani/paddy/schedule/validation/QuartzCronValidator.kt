@@ -8,7 +8,9 @@ import jakarta.validation.ConstraintValidatorContext
 
 class QuartzCronValidator : ConstraintValidator<QuartzCron, String> {
     override fun isValid(string: String?, ctx: ConstraintValidatorContext?): Boolean {
-        if (string == null) return false
+        // This is allowed because the "single"
+        // field may be populated
+        if (string == null) return true
 
         try {
             CronParser(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))

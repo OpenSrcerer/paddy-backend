@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull
 import online.danielstefani.paddy.daemon.Daemon
 import online.danielstefani.paddy.schedule.validation.QuartzCron
 import online.danielstefani.paddy.schedule.validation.Timezone
+import online.danielstefani.paddy.schedule.validation.ValidSchedule
 import org.neo4j.ogm.annotation.GeneratedValue
 import org.neo4j.ogm.annotation.Id
 import org.neo4j.ogm.annotation.NodeEntity
@@ -13,6 +14,7 @@ import org.neo4j.ogm.annotation.Relationship
 import java.util.*
 
 @NodeEntity
+@ValidSchedule
 open class Schedule {
 
     @Id

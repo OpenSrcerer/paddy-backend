@@ -5,6 +5,7 @@ import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.daemon.DaemonRepository
 import online.danielstefani.paddy.daemon.DaemonService
+import java.time.Instant
 
 @ApplicationScoped
 class MqttController(
@@ -17,7 +18,7 @@ class MqttController(
         val on = daemonService.getDaemon(daemonId)?.on ?: return
 
         daemonRepository.update(daemonId) {
-            it.lastPing = System.currentTimeMillis() / 1000
+            it.lastPing = Instant.now().epochSecond
         }
 
         mqtt.publish(daemonId, "toggle", if (on) "1" else "0", MqttQos.EXACTLY_ONCE)

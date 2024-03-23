@@ -144,6 +144,8 @@ class RxMqttClient(
      */
     private fun Mqtt5RxClient.connectScenario(): Observable<Mqtt5ConnAck> {
         return this.connectWith()
+            // Clean session is required:
+            // https://www.emqx.io/docs/en/latest/messaging/mqtt-shared-subscription.html#shared-subscription-and-session
             .cleanStart(true)
             .applyConnect()
             .doOnSubscribe { Log.info("[client->mqtt] // " +

@@ -67,4 +67,15 @@ class ScheduleRepository(
                 session().delete(it)
             }
     }
+
+    fun deleteAll(daemonId: String) {
+        val query = """
+                    MATCH
+                    (dx:Daemon { id: "$daemonId" })
+                        -[:IS_SCHEDULED]->
+                    (sx:Schedule)
+                    DETACH DELETE sx
+                """
+        session().query(query, emptyMap<String, String>())
+    }
 }

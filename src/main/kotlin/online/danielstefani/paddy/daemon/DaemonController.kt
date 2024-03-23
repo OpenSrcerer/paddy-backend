@@ -56,7 +56,7 @@ class DaemonController(
     @DELETE
     @Path("/{id}")
     fun deleteDaemon(@RestPath id: Long): RestResponse<Daemon> {
-        return daemonService.deleteDaemon(id.toString())
+        return daemonService.deleteDaemon(securityIdentity.username(), id.toString())
             ?.let { ok(it) }
             ?: status(Response.Status.NOT_FOUND)
     }

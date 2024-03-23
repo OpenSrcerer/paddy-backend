@@ -1,7 +1,6 @@
 package online.danielstefani.paddy.schedule
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import jakarta.annotation.Nullable
 import jakarta.validation.constraints.NotNull
 import online.danielstefani.paddy.daemon.Daemon
 import online.danielstefani.paddy.schedule.validation.QuartzCron
@@ -34,7 +33,6 @@ open class Schedule {
 
     // Signifies that this Schedule will run periodically.
     @QuartzCron
-    @Nullable
     var periodic: String? = null
 
     // The last time this Schedule was executed

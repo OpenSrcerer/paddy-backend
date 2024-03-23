@@ -47,10 +47,10 @@ class DaemonService(
     }
 
     fun toggleDaemon(daemonId: String): Boolean {
-        val daemon = daemonRepository.update(daemonId)
+        daemonRepository.update(daemonId)
             { it.on = !it.on } ?: return false
 
-        mqtt.publish(daemonId, "toggle", if (daemon.on) "1" else "0", MqttQos.EXACTLY_ONCE)
+        mqtt.publish(daemonId, "toggle", qos = MqttQos.EXACTLY_ONCE)
             ?.subscribe()
 
         return true

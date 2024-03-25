@@ -2,14 +2,11 @@ package online.danielstefani.paddy.user
 
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.repository.AbstractNeo4jRepository
-import online.danielstefani.paddy.repository.RequestScopedNeo4jSession
 import org.neo4j.ogm.session.queryForObject
 import java.util.*
 
 @ApplicationScoped
-class UserRepository(
-    private val session: RequestScopedNeo4jSession
-) : AbstractNeo4jRepository() {
+class UserRepository : AbstractNeo4jRepository() {
 
     /*
     Email & Username takes the same value if one

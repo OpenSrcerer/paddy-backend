@@ -9,12 +9,14 @@ import online.danielstefani.paddy.jwt.JwtAuthClient
 import online.danielstefani.paddy.jwt.dto.JwtRequestDto
 import online.danielstefani.paddy.jwt.dto.JwtType
 import online.danielstefani.paddy.mqtt.RxMqttClient
+import online.danielstefani.paddy.power.PowerRepository
 import online.danielstefani.paddy.schedule.ScheduleRepository
 import online.danielstefani.paddy.user.UserRepository
 import org.eclipse.microprofile.rest.client.inject.RestClient
 
 @ApplicationScoped
 class DaemonService(
+    private val powerRepository: PowerRepository,
     private val scheduleRepository: ScheduleRepository,
     private val daemonRepository: DaemonRepository,
     private val userRepository: UserRepository,
@@ -49,8 +51,9 @@ class DaemonService(
         // Get schedules first
         val schedules = scheduleRepository.getAll(username, daemonId)
 
-        // Delete all schedules from DB
+        // Delete all related entites from DB
         scheduleRepository.deleteAll(daemonId)
+        powerRepository.deleteAll(daemonId)
 
         // Inform scheduler to remove tasks
         schedules.map { mqtt.publish(it.id!!.toString()) }

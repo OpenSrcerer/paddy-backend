@@ -3,6 +3,7 @@ package online.danielstefani.paddy.daemon
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
+import online.danielstefani.paddy.power.Power
 import online.danielstefani.paddy.schedule.Schedule
 import online.danielstefani.paddy.user.User
 import org.neo4j.ogm.annotation.Id
@@ -33,4 +34,8 @@ open class Daemon() {
     @JsonIgnore
     @Relationship(type = "IS_SCHEDULED", direction = Relationship.Direction.OUTGOING)
     var schedules = setOf<Schedule>()
+
+    @JsonIgnore
+    @Relationship(type = "DRAWS", direction = Relationship.Direction.OUTGOING)
+    var powers = setOf<Power>()
 }

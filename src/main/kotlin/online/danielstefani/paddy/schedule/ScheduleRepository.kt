@@ -3,14 +3,11 @@ package online.danielstefani.paddy.schedule
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.daemon.Daemon
 import online.danielstefani.paddy.repository.AbstractNeo4jRepository
-import online.danielstefani.paddy.repository.RequestScopedNeo4jSession
 import online.danielstefani.paddy.util.get
 import org.neo4j.ogm.session.queryForObject
 
 @ApplicationScoped
-class ScheduleRepository(
-    private val session: RequestScopedNeo4jSession
-) : AbstractNeo4jRepository() {
+class ScheduleRepository : AbstractNeo4jRepository() {
 
     fun get(id: Long, daemonId: String? = null): Schedule? {
         val queryBuilder = StringBuilder().append("MATCH ")
@@ -27,11 +24,11 @@ class ScheduleRepository(
     fun getAll(daemonId: String, username: String): List<Schedule> {
         val query = """
                     MATCH 
-                    (ux:User { username: "$username" })
-                        -[:OWNS]->
-                    (dx:Daemon { id: "$daemonId" })
-                        -[:IS_SCHEDULED]->
-                    (sx:Schedule)
+                        (ux:User { username: "$username" })
+                            -[:OWNS]->
+                        (dx:Daemon { id: "$daemonId" })
+                            -[:IS_SCHEDULED]->
+                        (sx:Schedule)
                     RETURN sx
                 """
 
@@ -71,11 +68,12 @@ class ScheduleRepository(
     fun deleteAll(daemonId: String) {
         val query = """
                     MATCH
-                    (dx:Daemon { id: "$daemonId" })
-                        -[:IS_SCHEDULED]->
-                    (sx:Schedule)
+                        (dx:Daemon { id: "$daemonId" })
+                            -[:IS_SCHEDULED]->
+                        (sx:Schedule)
                     DETACH DELETE sx
                 """
+
         session().query(query, emptyMap<String, String>())
     }
 }

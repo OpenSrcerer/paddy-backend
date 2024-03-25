@@ -5,14 +5,31 @@ import io.quarkus.logging.Log
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.daemon.DaemonRepository
 import online.danielstefani.paddy.daemon.DaemonService
+import online.danielstefani.paddy.power.Power
+import online.danielstefani.paddy.power.PowerRepository
 import java.time.Instant
 
 @ApplicationScoped
 class MqttController(
     private val mqtt: RxMqttClient,
     private val daemonService: DaemonService,
-    private val daemonRepository: DaemonRepository
+    private val daemonRepository: DaemonRepository,
+    private val powerRepository: PowerRepository
 ) {
+    @DaemonAction("power")
+    fun power(daemonId: String, body: String?) {
+        val timestamp = Instant.now().epochSecond
+
+        val daemon = daemonRepository.get(daemonId) ?: return
+
+        val power = Power().also {
+            it.w = body?.toLong() ?: return
+            it.timestamp = timestamp
+        }
+
+        powerRepository.create(daemon, power)
+    }
+
     @DaemonAction("ping")
     fun ping(daemonId: String, body: String?) {
         val on = daemonService.getDaemon(daemonId)?.on ?: return

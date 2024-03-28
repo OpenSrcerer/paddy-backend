@@ -61,7 +61,7 @@ class PowerRepository : AbstractNeo4jRepository() {
                         (px:Power)
                         ?
                     RETURN px
-                    SORT BY px.timestamp DESC
+                    ORDER BY px.timestamp DESC
                     LIMIT $limit
                 """
             .replace("?", replacement)

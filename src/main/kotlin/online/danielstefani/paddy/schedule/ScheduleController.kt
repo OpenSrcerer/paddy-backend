@@ -22,7 +22,6 @@ class ScheduleController(
     private val scheduleRepository: ScheduleRepository,
     private val mqttClient: RxMqttClient
 ) {
-
     @GET
     @Path("/{id}")
     fun getSchedule(

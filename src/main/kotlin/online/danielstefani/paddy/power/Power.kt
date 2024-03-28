@@ -12,6 +12,7 @@ open class Power {
 
     @Id
     @GeneratedValue
+    @JsonIgnore
     var id: Long? = null
 
     var w: Long? = null

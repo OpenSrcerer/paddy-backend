@@ -35,10 +35,16 @@ class PowerRepository : AbstractNeo4jRepository() {
         return session().query(query, emptyMap<String, String>()).get()
     }
 
-    fun getAllAfter(
+    /*
+    Get all Power-s between two UNIX timestamps.
+    Both the timestamps are exclusive.
+    */
+    fun getAllBetween(
         daemonId: String,
         username: String,
-        after: Long
+        limit: Int = 25,
+        before: Long? = null,
+        after: Long? = null
     ): List<Power> {
         val query = """
                     MATCH 
@@ -47,11 +53,18 @@ class PowerRepository : AbstractNeo4jRepository() {
                         (dx:Daemon { id: "$daemonId" })
                             -[:DRAWS]->
                         (px:Power)
-                        WHERE px.w > $after
+                        ?
                     RETURN px
+                    LIMIT $limit
                 """
 
-        return session().query(query, emptyMap<String, String>()).get()
+        val replacement =
+            if (before != null && after != null) "WHERE px.timestamp > $after AND px.timestamp < $before"
+            else if (after != null) "WHERE px.timestamp > $after"
+            else if (before != null) "WHERE px.timestamp < $before"
+            else ""
+
+        return session().query(query, mapOf("?" to replacement)).get()
     }
 
     fun create(

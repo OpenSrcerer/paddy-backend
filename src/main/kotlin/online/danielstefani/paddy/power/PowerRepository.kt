@@ -46,6 +46,12 @@ class PowerRepository : AbstractNeo4jRepository() {
         before: Long? = null,
         after: Long? = null
     ): List<Power> {
+        val replacement =
+            if (before != null && after != null) "WHERE px.timestamp > $after AND px.timestamp < $before"
+            else if (after != null) "WHERE px.timestamp > $after"
+            else if (before != null) "WHERE px.timestamp < $before"
+            else ""
+
         val query = """
                     MATCH 
                         (ux:User { username: "$username" })
@@ -55,16 +61,15 @@ class PowerRepository : AbstractNeo4jRepository() {
                         (px:Power)
                         ?
                     RETURN px
+                    SORT BY px.timestamp DESC
                     LIMIT $limit
                 """
+            .replace("?", replacement)
 
-        val replacement =
-            if (before != null && after != null) "WHERE px.timestamp > $after AND px.timestamp < $before"
-            else if (after != null) "WHERE px.timestamp > $after"
-            else if (before != null) "WHERE px.timestamp < $before"
-            else ""
-
-        return session().query(query, mapOf("?" to replacement)).get()
+        return session().query(
+            query,
+            mapOf<String, String>()
+        ).get()
     }
 
     fun create(

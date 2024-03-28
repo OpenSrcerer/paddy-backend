@@ -4,7 +4,6 @@ import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.daemon.Daemon
 import online.danielstefani.paddy.repository.RequestScopedNeo4jSession
-import org.neo4j.ogm.session.queryForObject
 
 @ApplicationScoped
 class HttpSecurityRepository(
@@ -19,7 +18,7 @@ class HttpSecurityRepository(
                     """
 
         return Uni.createFrom().emitter {
-            it.complete(session().queryForObject<Daemon>(query, emptyMap()))
+            it.complete(session.queryForObject<Daemon>(query))
         }
     }
 }

@@ -15,7 +15,7 @@ class DaemonRepository : AbstractNeo4jRepository() {
                     RETURN node
                 """
 
-        return session().queryForObject<Daemon>(query, emptyMap())
+        return session.queryForObject<Daemon>(query)
     }
 
     fun update(
@@ -30,14 +30,12 @@ class DaemonRepository : AbstractNeo4jRepository() {
     }
 
     fun getAllUserDaemons(user: User): List<Daemon> {
-        val result = session().query(
-            """
-                    MATCH (ux:User { username: "${user.username}" })
-                        -[:OWNS]-> (dx:Daemon)
-                    RETURN dx
-                """, emptyMap<String, String>())
-
-        return result.get()
+        return session.query<Daemon>(
+                    """
+                        MATCH (ux:User { username: "${user.username}" })
+                            -[:OWNS]-> (dx:Daemon)
+                        RETURN dx
+                    """)
     }
 
     fun createUserDaemon(id: String, user: User): Daemon? {

@@ -18,7 +18,7 @@ class ScheduleRepository : AbstractNeo4jRepository() {
 
         val query = queryBuilder.append("(sx:Schedule) WHERE ID(sx) = $id RETURN sx").toString()
 
-        return session().queryForObject<Schedule>(query, emptyMap())
+        return session.queryForObject<Schedule>(query)
     }
 
     fun getAll(daemonId: String, username: String): List<Schedule> {
@@ -32,7 +32,7 @@ class ScheduleRepository : AbstractNeo4jRepository() {
                     RETURN sx
                 """
 
-        return session().query(query, emptyMap<String, String>()).get()
+        return session.query(query)
     }
 
     fun update(
@@ -74,6 +74,6 @@ class ScheduleRepository : AbstractNeo4jRepository() {
                     DETACH DELETE sx
                 """
 
-        session().query(query, emptyMap<String, String>())
+        session.query<Schedule>(query)
     }
 }

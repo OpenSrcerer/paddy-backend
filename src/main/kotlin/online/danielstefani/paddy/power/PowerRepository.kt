@@ -18,7 +18,7 @@ class PowerRepository : AbstractNeo4jRepository() {
 
         val query = queryBuilder.append("(px:Power) WHERE ID(px) = $id RETURN px").toString()
 
-        return session().queryForObject<Power>(query, emptyMap())
+        return session.queryForObject<Power>(query)
     }
 
     fun getAll(daemonId: String, username: String): List<Power> {
@@ -32,7 +32,7 @@ class PowerRepository : AbstractNeo4jRepository() {
                     RETURN px
                 """
 
-        return session().query(query, emptyMap<String, String>()).get()
+        return session.query(query)
     }
 
     /*
@@ -42,7 +42,7 @@ class PowerRepository : AbstractNeo4jRepository() {
     fun getAllBetween(
         daemonId: String,
         username: String,
-        limit: Int = 25,
+        limit: Int = 10,
         before: Long? = null,
         after: Long? = null
     ): List<Power> {
@@ -66,10 +66,7 @@ class PowerRepository : AbstractNeo4jRepository() {
                 """
             .replace("?", replacement)
 
-        return session().query(
-            query,
-            mapOf<String, String>()
-        ).get()
+        return session.query(query)
     }
 
     fun create(
@@ -92,7 +89,7 @@ class PowerRepository : AbstractNeo4jRepository() {
                     DETACH DELETE px
                 """
 
-        session().query(query, emptyMap<String, String>())
+        session.query<Power>(query)
     }
 
     fun deleteAllBefore(
@@ -108,6 +105,6 @@ class PowerRepository : AbstractNeo4jRepository() {
                     RETURN px
                 """
 
-        return session().query(query, emptyMap<String, String>()).get()
+        return session.query(query)
     }
 }

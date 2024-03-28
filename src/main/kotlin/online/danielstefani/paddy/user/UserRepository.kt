@@ -14,13 +14,13 @@ class UserRepository : AbstractNeo4jRepository() {
     could be email or username and that's logical.
      */
     fun get(email: String, username: String = email): User? {
-        return session().queryForObject<User>(
+        return session.queryForObject(
             """
                 MATCH (node:User)
                 WHERE (node.email = "$email" 
                     OR node.username = "$username")
                 RETURN node
-            """, emptyMap())
+            """)
     }
 
     fun create(

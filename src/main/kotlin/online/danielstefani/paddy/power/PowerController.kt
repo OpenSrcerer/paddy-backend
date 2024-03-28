@@ -22,7 +22,7 @@ class PowerController(
     @GET
     fun getAllPowers(
         @RestPath daemonId: String,
-        @RestQuery limit: Int = 25,
+        @RestQuery limit: Int = 10,
         @RestQuery before: Long? = null,
         @RestQuery after: Long? = null
     ): List<Power> {

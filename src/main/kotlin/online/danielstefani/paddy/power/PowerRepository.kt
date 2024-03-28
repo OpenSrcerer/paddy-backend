@@ -59,12 +59,12 @@ class PowerRepository : AbstractNeo4jRepository() {
                         (px:Power)
                         ?
                     RETURN px
-                    ORDER BY px.timestamp ASC
+                    ORDER BY px.timestamp DESC
                     LIMIT $limit
                 """
             .replace("?", replacement)
 
-        return session.query(query)
+        return session.query<Power>(query).reversed()
     }
 
     fun create(

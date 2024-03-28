@@ -9,7 +9,7 @@ import org.jboss.resteasy.reactive.RestPath
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Authenticated
-class GroupController() {
+class GroupController {
 
     @GET
     @Path("/{id}")

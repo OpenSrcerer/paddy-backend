@@ -3,8 +3,6 @@ package online.danielstefani.paddy.power
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.daemon.Daemon
 import online.danielstefani.paddy.repository.AbstractNeo4jRepository
-import online.danielstefani.paddy.util.get
-import org.neo4j.ogm.session.queryForObject
 
 @ApplicationScoped
 class PowerRepository : AbstractNeo4jRepository() {

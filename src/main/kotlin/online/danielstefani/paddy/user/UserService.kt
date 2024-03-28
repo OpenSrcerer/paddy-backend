@@ -7,6 +7,4 @@ import online.danielstefani.paddy.daemon.DaemonRepository
 class UserService(
     private val userRepository: UserRepository,
     private val daemonRepository: DaemonRepository
-) {
-
-}
+)

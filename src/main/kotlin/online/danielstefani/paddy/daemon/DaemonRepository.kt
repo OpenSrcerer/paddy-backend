@@ -3,8 +3,6 @@ package online.danielstefani.paddy.daemon
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.repository.AbstractNeo4jRepository
 import online.danielstefani.paddy.user.User
-import online.danielstefani.paddy.util.get
-import org.neo4j.ogm.session.queryForObject
 
 @ApplicationScoped
 class DaemonRepository : AbstractNeo4jRepository() {

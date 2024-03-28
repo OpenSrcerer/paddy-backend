@@ -2,7 +2,6 @@ package online.danielstefani.paddy.user
 
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.repository.AbstractNeo4jRepository
-import org.neo4j.ogm.session.queryForObject
 import java.util.*
 
 @ApplicationScoped

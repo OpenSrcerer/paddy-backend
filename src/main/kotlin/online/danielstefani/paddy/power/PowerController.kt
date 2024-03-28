@@ -2,10 +2,7 @@ package online.danielstefani.paddy.power
 
 import io.quarkus.security.Authenticated
 import io.quarkus.security.identity.SecurityIdentity
-import jakarta.ws.rs.Consumes
-import jakarta.ws.rs.GET
-import jakarta.ws.rs.Path
-import jakarta.ws.rs.Produces
+import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import online.danielstefani.paddy.util.username
 import org.jboss.resteasy.reactive.RestPath
@@ -22,7 +19,7 @@ class PowerController(
     @GET
     fun getAllPowers(
         @RestPath daemonId: String,
-        @RestQuery limit: Int = 10,
+        @RestQuery @DefaultValue("10") limit: Int,
         @RestQuery before: Long? = null,
         @RestQuery after: Long? = null
     ): List<Power> {

@@ -23,7 +23,7 @@ class MqttController(
         val daemon = daemonRepository.get(daemonId) ?: return
 
         val power = Power().also {
-            it.w = body?.toLong() ?: return
+            it.w = body?.toFloat() ?: return
             it.timestamp = timestamp
         }
 

@@ -15,7 +15,7 @@ open class Power {
     @JsonIgnore
     var id: Long? = null
 
-    var w: Long? = null
+    var w: Float? = null
 
     var timestamp: Long? = null
 

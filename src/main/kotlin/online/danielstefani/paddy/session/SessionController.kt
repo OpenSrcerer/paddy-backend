@@ -1,5 +1,7 @@
 package online.danielstefani.paddy.session
 
+import io.quarkus.security.Authenticated
+import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
 import jakarta.ws.rs.Consumes
 import jakarta.ws.rs.POST
@@ -12,8 +14,10 @@ import online.danielstefani.paddy.jwt.dto.JwtRequestDto
 import online.danielstefani.paddy.jwt.dto.JwtResponseDto
 import online.danielstefani.paddy.jwt.dto.JwtType
 import online.danielstefani.paddy.session.dto.LoginRequestDto
+import online.danielstefani.paddy.session.dto.RefreshRequestDto
 import online.danielstefani.paddy.user.UserRepository
 import online.danielstefani.paddy.util.isPasswordHashMatch
+import online.danielstefani.paddy.util.username
 import org.eclipse.microprofile.rest.client.inject.RestClient
 import org.jboss.resteasy.reactive.RestResponse
 import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder
@@ -23,9 +27,13 @@ import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder
 @Produces(MediaType.APPLICATION_JSON)
 class SessionController(
     private val userRepository: UserRepository,
+    private val securityIdentity: SecurityIdentity,
     @RestClient private val paddyAuth: JwtAuthClient
 ) {
-    /* Sets the paddy-jwt to the newly generated user jwt */
+    /*
+    Returns a refresh token to the client. The client can use this token
+    as a manner to obtain access JWTs.
+     */
     @POST
     @Path("/login")
     fun login(dto: LoginRequestDto): Uni<RestResponse<JwtResponseDto>> {
@@ -35,7 +43,18 @@ class SessionController(
         if (!isPasswordHashMatch(dto.passwordHash, user.passwordHash!!, user.passwordSalt!!))
             return Uni.createFrom().item(RestResponse.status(Response.Status.FORBIDDEN))
 
-        return paddyAuth.generateJwt(JwtRequestDto(user.username!!, JwtType.USER))
+        return paddyAuth.generateJwt(JwtRequestDto(user.username!!, JwtType.REFRESH))
+            .map { ResponseBuilder.ok(it).build() }
+    }
+
+    @POST
+    @Path("/refresh")
+    @Authenticated
+    fun refresh(dto: RefreshRequestDto): Uni<RestResponse<JwtResponseDto>> {
+        userRepository.get(securityIdentity.username())
+            ?: return Uni.createFrom().item(RestResponse.status(Response.Status.NOT_FOUND))
+
+        return paddyAuth.generateJwt(JwtRequestDto(securityIdentity.username(), JwtType.USER))
             .map { ResponseBuilder.ok(it).build() }
     }
 }

@@ -6,8 +6,8 @@ import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
 import online.danielstefani.paddy.jwt.dto.JwtRequestDto
 import online.danielstefani.paddy.jwt.dto.JwtResponseDto
-import online.danielstefani.paddy.security.dto.AuthorizationRequestDto
-import online.danielstefani.paddy.security.dto.AuthorizationResultDto
+import online.danielstefani.paddy.security.dto.AuthenticationRequestDto
+import online.danielstefani.paddy.security.dto.AuthenticationResultDto
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient
 
 /**
@@ -25,6 +25,6 @@ interface JwtAuthClient {
 
     @POST
     @Path("/validate")
-    fun validateJwt(request: AuthorizationRequestDto): Uni<AuthorizationResultDto>
+    fun validateJwt(request: AuthenticationRequestDto): Uni<AuthenticationResultDto>
 
 }

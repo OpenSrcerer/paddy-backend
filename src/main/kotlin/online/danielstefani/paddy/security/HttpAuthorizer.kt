@@ -1,6 +1,5 @@
 package online.danielstefani.paddy.security
 
-import io.quarkus.logging.Log
 import io.quarkus.security.identity.SecurityIdentity
 import io.quarkus.vertx.http.runtime.security.HttpSecurityPolicy
 import io.quarkus.vertx.http.runtime.security.HttpSecurityPolicy.AuthorizationRequestContext
@@ -38,19 +37,22 @@ class HttpAuthorizer(
         if (identity == null) {
             return Uni.createFrom().item(true)
         }
-
         val path = event.pathParam("*")
-        if (path.startsWith("daemon")) {
-            return authorizeDaemonRoute(path, identity)
-        }
 
-        return Uni.createFrom().item(true)
+        return identity.flatMap { id ->
+            return@flatMap if (id?.hasRole("refresh") == true && path.equals("refresh"))
+                Uni.createFrom().item(true)
+            else if (path.startsWith("daemon"))
+                authorizeDaemonRoute(path, id)
+            else
+                Uni.createFrom().item(true)
+        }
     }
 
     @ActivateRequestContext
     fun authorizeDaemonRoute(
         path: String,
-        identity: Uni<SecurityIdentity?>
+        identity: SecurityIdentity?
     ): Uni<Boolean> {
         val splitPath = path.split("/")
         if (splitPath.size <= 1) {
@@ -62,10 +64,7 @@ class HttpAuthorizer(
             return Uni.createFrom().item(false)
         }
 
-        return identity
-            .flatMap {
-                if (it != null) securityService.hasAccessToDaemon(it.username(), splitPath[1])
-                else Uni.createFrom().item(false)
-            }
+        return if (identity != null) securityService.hasAccessToDaemon(identity.username(), splitPath[1])
+            else Uni.createFrom().item(false)
     }
 }

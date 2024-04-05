@@ -15,9 +15,9 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.inject.Alternative
 import online.danielstefani.paddy.jwt.JwtAuthClient
 
-import online.danielstefani.paddy.security.dto.AuthorizationRequestDto
-import online.danielstefani.paddy.security.dto.AuthorizationResultDto
-import online.danielstefani.paddy.security.dto.AuthorizationResultDto.AuthorizationResult
+import online.danielstefani.paddy.security.dto.AuthenticationRequestDto
+import online.danielstefani.paddy.security.dto.AuthenticationResultDto
+import online.danielstefani.paddy.security.dto.AuthenticationResultDto.AuthenticationResult
 import org.eclipse.microprofile.rest.client.inject.RestClient
 
 
@@ -46,10 +46,11 @@ class HttpAuthenticator(
                 with(QuarkusSecurityIdentity.builder()) {
                     setPrincipal { it.resource!! }
 
-                    if (it.result == AuthorizationResult.ALLOW)
-                        addRole(it.resource!!)
-                    else
-                        setAnonymous(true)
+                    when (it.result) {
+                        AuthenticationResult.REFRESH -> addRole("refresh")
+                        AuthenticationResult.ALLOW -> addRole(it.resource!!)
+                        else -> setAnonymous(true)
+                    }
 
                     build()
                 }
@@ -57,12 +58,12 @@ class HttpAuthenticator(
     }
 
     // Don't contact auth server is bearer is missing
-    private fun checkJwt(jwt: String?): Uni<AuthorizationResultDto> {
+    private fun checkJwt(jwt: String?): Uni<AuthenticationResultDto> {
         if (jwt == null) {
             return Uni.createFrom().item(
-                AuthorizationResultDto(AuthorizationResult.DENY, "<missing jwt>"))
+                AuthenticationResultDto(AuthenticationResult.DENY, "<missing jwt>"))
         }
-        return paddyAuth.validateJwt(AuthorizationRequestDto(jwt))
+        return paddyAuth.validateJwt(AuthenticationRequestDto(jwt))
     }
 
     /*

@@ -21,6 +21,9 @@ class User {
     @JsonIgnore
     var passwordSalt: String? = null // PBKDF2 salt
 
+//    @JsonIgnore
+//    var refreshToken: String? = null
+
     @Relationship(type = "OWNS", direction = Relationship.Direction.OUTGOING)
     var daemons = setOf<Daemon>()
 }

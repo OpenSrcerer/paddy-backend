@@ -5,12 +5,15 @@ import com.fasterxml.jackson.annotation.JsonValue
 import java.util.*
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class AuthorizationResultDto(
-    val result: AuthorizationResult,
+class AuthenticationResultDto(
+    val result: AuthenticationResult,
     val resource: String? = null
 ) {
-    enum class AuthorizationResult {
-        ALLOW, DENY, IGNORE;
+    enum class AuthenticationResult {
+        ALLOW,
+        DENY,
+        REFRESH,
+        IGNORE;
 
         @JsonValue
         fun toLowerCase(): String {

@@ -41,11 +41,10 @@ class HttpAuthorizer(
 
         return identity.flatMap { id ->
 
-//            // Only allow refresh tokens to access /refresh API to retrieve real token
-//            if (id?.hasRole("refresh") == true) {
-//                return@flatMap if (path.equals("refresh")) Uni.createFrom().item(true)
-//                else Uni.createFrom().item(false)
-//            }
+            // Only allow refresh tokens to access /refresh API to retrieve real token
+            if (id?.hasRole("refresh") == true && !path.equals("refresh")) {
+                return@flatMap Uni.createFrom().item(false)
+            }
 
             // This is to protect users from accessing other user's daemons
             return@flatMap if (path.startsWith("daemon"))

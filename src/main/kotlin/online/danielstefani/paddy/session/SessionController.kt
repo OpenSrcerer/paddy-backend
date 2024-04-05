@@ -14,7 +14,6 @@ import online.danielstefani.paddy.jwt.dto.JwtRequestDto
 import online.danielstefani.paddy.jwt.dto.JwtResponseDto
 import online.danielstefani.paddy.jwt.dto.JwtType
 import online.danielstefani.paddy.session.dto.LoginRequestDto
-import online.danielstefani.paddy.session.dto.RefreshRequestDto
 import online.danielstefani.paddy.user.UserRepository
 import online.danielstefani.paddy.util.isPasswordHashMatch
 import online.danielstefani.paddy.util.username
@@ -50,7 +49,7 @@ class SessionController(
     @POST
     @Path("/refresh")
     @Authenticated
-    fun refresh(dto: RefreshRequestDto): Uni<RestResponse<JwtResponseDto>> {
+    fun refresh(): Uni<RestResponse<JwtResponseDto>> {
         userRepository.get(securityIdentity.username())
             ?: return Uni.createFrom().item(RestResponse.status(Response.Status.NOT_FOUND))
 

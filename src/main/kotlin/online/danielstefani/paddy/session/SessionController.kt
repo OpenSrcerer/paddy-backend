@@ -1,6 +1,5 @@
 package online.danielstefani.paddy.session
 
-import io.quarkus.security.Authenticated
 import io.quarkus.security.identity.SecurityIdentity
 import io.smallrye.mutiny.Uni
 import jakarta.annotation.security.RolesAllowed
@@ -49,7 +48,6 @@ class SessionController(
 
     @POST
     @Path("/refresh")
-    @Authenticated
     @RolesAllowed("refresh")
     fun refresh(): Uni<RestResponse<JwtResponseDto>> {
         userRepository.get(securityIdentity.username())

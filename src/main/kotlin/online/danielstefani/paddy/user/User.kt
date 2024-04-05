@@ -21,8 +21,14 @@ class User {
     @JsonIgnore
     var passwordSalt: String? = null // PBKDF2 salt
 
-//    @JsonIgnore
-//    var refreshToken: String? = null
+    /*
+    The refresh token serial is a simple mechanism.
+    All refresh tokens are signed with this identifier.
+
+    If this identifier differs from the token, the refresh token is invalid.
+     */
+    @JsonIgnore
+    var refreshTokenSerial: String? = null
 
     @Relationship(type = "OWNS", direction = Relationship.Direction.OUTGOING)
     var daemons = setOf<Daemon>()

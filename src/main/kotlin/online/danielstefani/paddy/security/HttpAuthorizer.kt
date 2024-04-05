@@ -42,7 +42,7 @@ class HttpAuthorizer(
         return identity.flatMap { id ->
 
             // Only allow refresh tokens to access /refresh API to retrieve real token
-            if (id?.hasRole("refresh") == true && !path.equals("refresh")) {
+            if (id?.hasRole("refresh") == true && !path.equals("session/refresh")) {
                 return@flatMap Uni.createFrom().item(false)
             }
 

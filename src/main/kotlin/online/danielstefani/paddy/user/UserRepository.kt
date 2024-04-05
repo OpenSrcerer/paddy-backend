@@ -36,6 +36,7 @@ class UserRepository : AbstractNeo4jRepository() {
                 it.username = username
                 it.passwordHash = passwordHash
                 it.passwordSalt = passwordSalt
+                it.refreshTokenSerial = UUID.randomUUID().toString()
 
                 session().save(it)
             }

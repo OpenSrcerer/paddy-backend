@@ -18,6 +18,7 @@ import online.danielstefani.paddy.user.UserRepository
 import online.danielstefani.paddy.util.isPasswordHashMatch
 import online.danielstefani.paddy.util.username
 import org.eclipse.microprofile.rest.client.inject.RestClient
+import org.jboss.resteasy.reactive.RestHeader
 import org.jboss.resteasy.reactive.RestResponse
 import org.jboss.resteasy.reactive.RestResponse.ResponseBuilder
 
@@ -42,14 +43,16 @@ class SessionController(
         if (!isPasswordHashMatch(dto.passwordHash, user.passwordHash!!, user.passwordSalt!!))
             return Uni.createFrom().item(RestResponse.status(Response.Status.FORBIDDEN))
 
-        return paddyAuth.generateJwt(JwtRequestDto(user.username!!, JwtType.REFRESH))
+        return paddyAuth.generateJwt(JwtRequestDto(user.username!!, JwtType.REFRESH, user.refreshTokenSerial))
             .map { ResponseBuilder.ok(it).build() }
     }
 
     @POST
     @Path("/refresh")
     @RolesAllowed("refresh")
-    fun refresh(): Uni<RestResponse<JwtResponseDto>> {
+    fun refresh(
+        @RestHeader("Authorization") authorization: String
+    ): Uni<RestResponse<JwtResponseDto>> {
         userRepository.get(securityIdentity.username())
             ?: return Uni.createFrom().item(RestResponse.status(Response.Status.NOT_FOUND))
 

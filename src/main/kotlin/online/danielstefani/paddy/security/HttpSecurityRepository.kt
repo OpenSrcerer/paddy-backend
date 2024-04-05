@@ -21,4 +21,14 @@ class HttpSecurityRepository(
             it.complete(session.queryForObject<Daemon>(query))
         }
     }
+
+    fun getUserRts(username: String): Uni<String?> {
+        val query = """
+                        MATCH (ux:User { username: "$username" }) 
+                        RETURN ux.refreshTokenSerial
+                    """
+        return Uni.createFrom().emitter {
+            it.complete(session.queryForObject<String>(query))
+        }
+    }
 }

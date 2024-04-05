@@ -12,6 +12,7 @@ import io.smallrye.mutiny.Uni
 import io.vertx.ext.web.RoutingContext
 import jakarta.annotation.Priority
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.enterprise.context.control.ActivateRequestContext
 import jakarta.enterprise.inject.Alternative
 import online.danielstefani.paddy.jwt.JwtAuthClient
 
@@ -25,6 +26,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient
 @Priority(1)
 @ApplicationScoped
 class HttpAuthenticator(
+    private val repository: HttpSecurityRepository,
     @RestClient private val paddyAuth: JwtAuthClient
 ) : HttpAuthenticationMechanism {
 
@@ -57,13 +59,27 @@ class HttpAuthenticator(
             }
     }
 
-    // Don't contact auth server is bearer is missing
-    private fun checkJwt(jwt: String?): Uni<AuthenticationResultDto> {
+    @ActivateRequestContext
+    protected fun checkJwt(jwt: String?): Uni<AuthenticationResultDto> {
+        // Don't contact auth server is bearer is missing
         if (jwt == null) {
             return Uni.createFrom().item(
                 AuthenticationResultDto(AuthenticationResult.DENY, "<missing jwt>"))
         }
+
         return paddyAuth.validateJwt(AuthenticationRequestDto(jwt))
+            .flatMap { authRes ->
+                // Regular case: Non-refresh token
+                if (authRes.result != AuthenticationResult.REFRESH)
+                    return@flatMap Uni.createFrom().item(authRes)
+
+                // For refresh tokens we have to check with the auth server twice.
+                // This is because first we 1) check the validity of the token (signature).
+                // Then, 2) we extract the "sub" from it, get the user's Refresh Token Serial,
+                // and validate the token again.
+                return@flatMap repository.getUserRts(authRes.resource!!)
+                    .flatMap { paddyAuth.validateJwt(AuthenticationRequestDto(jwt, refreshTokenSerial = it)) }
+            }
     }
 
     /*

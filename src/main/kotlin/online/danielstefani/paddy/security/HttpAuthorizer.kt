@@ -34,18 +34,25 @@ class HttpAuthorizer(
         event: RoutingContext,
         identity: Uni<SecurityIdentity?>?
     ): Uni<Boolean> {
-        if (identity == null) {
+        if (identity == null)
             return Uni.createFrom().item(true)
-        }
+
         val path = event.pathParam("*")
 
         return identity.flatMap { id ->
-            return@flatMap if (id?.hasRole("refresh") == true && path.equals("refresh"))
-                Uni.createFrom().item(true)
-            else if (path.startsWith("daemon"))
+
+//            // Only allow refresh tokens to access /refresh API to retrieve real token
+//            if (id?.hasRole("refresh") == true) {
+//                return@flatMap if (path.equals("refresh")) Uni.createFrom().item(true)
+//                else Uni.createFrom().item(false)
+//            }
+
+            // This is to protect users from accessing other user's daemons
+            return@flatMap if (path.startsWith("daemon"))
                 authorizeDaemonRoute(path, id)
             else
                 Uni.createFrom().item(true)
+
         }
     }
 

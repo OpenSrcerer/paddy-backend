@@ -60,7 +60,7 @@ class DaemonService(
     }
 
     fun deleteDaemon(username: String, daemonId: String): Daemon? {
-        daemonRepository.get(daemonId) ?: return null
+        resetDaemon(username, daemonId) ?: return null
 
         // Get schedules first
         val schedules = scheduleRepository.getAll(username, daemonId)
@@ -72,14 +72,15 @@ class DaemonService(
         // Inform scheduler to remove tasks
         schedules.map { mqtt.publish(it.id!!.toString()) }
             .let { Flowable.concat(it) }
-            // Also turn the device off
-            .concatWith(mqtt.publish(daemonId, action = "off", qos = MqttQos.EXACTLY_ONCE))
             .subscribe()
 
         // Delete the daemon itself
         return daemonRepository.deleteUserDaemon(daemonId)
     }
 
+    /*
+    Turn the daemon off and reset it (deletes all credentials in Daemon).
+     */
     fun resetDaemon(username: String, daemonId: String): Daemon? {
         val daemon = daemonRepository.get(daemonId) ?: return null
 

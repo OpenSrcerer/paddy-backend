@@ -48,6 +48,33 @@ class DaemonController(
     }
 
     @PATCH
+    @Path("/{id}/toggle")
+    fun toggleDaemon(@RestPath id: Long): RestResponse<Unit> {
+        return if (daemonService.toggleDaemon(id.toString())) ok()
+        else notFound()
+    }
+
+    @PATCH
+    @Path("/{id}/recover")
+    fun recoverDaemon(
+        @NotNull @Valid daemon: Daemon
+    ): Uni<RestResponse<CreateDaemonResponse?>> {
+        return daemonService.createDaemon(securityIdentity.username(), daemon.id!!.toLong(), true)
+            .map {
+                if (it != null) ResponseBuilder.ok(it).build()
+                else status(Response.Status.CONFLICT)
+            }
+    }
+
+    @PATCH
+    @Path("/{id}/reset")
+    fun resetDaemon(@RestPath id: Long): RestResponse<Daemon> {
+        return daemonService.resetDaemon(securityIdentity.username(), id.toString())
+            ?.let { ok(it) }
+            ?: status(Response.Status.NOT_FOUND)
+    }
+
+    @PATCH
     @Path("/{id}")
     fun patchDaemon(@RestPath id: Long): String {
         return ":) Not Implemented Yet"
@@ -59,13 +86,6 @@ class DaemonController(
         return daemonService.deleteDaemon(securityIdentity.username(), id.toString())
             ?.let { ok(it) }
             ?: status(Response.Status.NOT_FOUND)
-    }
-
-    @PATCH
-    @Path("/{id}/toggle")
-    fun toggleDaemon(@RestPath id: Long): RestResponse<Unit> {
-        return if (daemonService.toggleDaemon(id.toString())) ok()
-        else notFound()
     }
 }
 

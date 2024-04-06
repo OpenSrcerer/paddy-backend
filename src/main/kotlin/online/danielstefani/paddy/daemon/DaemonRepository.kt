@@ -33,6 +33,7 @@ class DaemonRepository : AbstractNeo4jRepository() {
                         MATCH (ux:User { username: "${user.username}" })
                             -[:OWNS]-> (dx:Daemon)
                         RETURN dx
+                        ORDER BY elementId(dx)
                     """)
     }
 

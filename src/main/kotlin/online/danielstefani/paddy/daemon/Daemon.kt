@@ -25,8 +25,9 @@ open class Daemon() {
 
     var on: Boolean = false
 
-    // If this field is "-1" it means the Daemon is in recovery mode.
     var lastPing: Long = 0
+
+    var recovery: Boolean = false
 
     @JsonIgnore
     @Relationship(type = "OWNS", direction = Relationship.Direction.INCOMING)

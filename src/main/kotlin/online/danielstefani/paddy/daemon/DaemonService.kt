@@ -87,10 +87,7 @@ class DaemonService(
         mqtt.publish(daemonId, action = "reset", qos = MqttQos.EXACTLY_ONCE)
             ?.blockingLast() ?: return null // Fail if failed to send reset message
 
-        // There may be a race corner case in this situation
-        // where a ping is received after this update, and it prevents
-        // the device from entering recovery. To investigate.
-        daemonRepository.update(daemonId) { it.lastPing = -1 }
+        daemonRepository.update(daemonId) { it.recovery = true }
 
         return daemon
     }

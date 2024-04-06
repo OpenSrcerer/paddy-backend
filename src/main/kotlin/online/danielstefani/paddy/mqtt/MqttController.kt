@@ -35,6 +35,7 @@ class MqttController(
         val on = daemonService.getDaemon(daemonId)?.on ?: return
 
         daemonRepository.update(daemonId) {
+            it.recovery = false
             it.lastPing = Instant.now().epochSecond
         }
 

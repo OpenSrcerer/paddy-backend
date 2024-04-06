@@ -34,16 +34,17 @@ class DaemonService(
 
     fun createDaemon(
         username: String,
-        daemonId: Long,
-        recovery: Boolean = false
+        daemonId: Long
     ): Uni<CreateDaemonResponse?> {
         val user = userRepository.get(username)
+        val daemon = daemonRepository.get("$daemonId", username)
+
+        // If daemon already exists and is not in recovery mode, prevent conflicts
+        if (daemon?.recovery == true) return Uni.createFrom().nullItem()
 
         val daemonUni: Uni<Daemon?> =
-            if (recovery)
-                Uni.createFrom().emitter {
-                    it.complete(daemonRepository.get("$daemonId", username))
-                }
+            if (daemon != null)
+                Uni.createFrom().item(daemon)
             else
                 Uni.createFrom().emitter {
                     it.complete(daemonRepository.createUserDaemon("$daemonId", user!!))

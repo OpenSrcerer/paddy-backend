@@ -55,16 +55,6 @@ class DaemonController(
     }
 
     @PATCH
-    @Path("/{id}/recover")
-    fun recoverDaemon(@RestPath id: Long): Uni<RestResponse<CreateDaemonResponse?>> {
-        return daemonService.createDaemon(securityIdentity.username(), id, true)
-            .map {
-                if (it != null) ResponseBuilder.ok(it).build()
-                else status(Response.Status.CONFLICT)
-            }
-    }
-
-    @PATCH
     @Path("/{id}/reset")
     fun resetDaemon(@RestPath id: Long): RestResponse<Daemon> {
         return daemonService.resetDaemon(securityIdentity.username(), id.toString())

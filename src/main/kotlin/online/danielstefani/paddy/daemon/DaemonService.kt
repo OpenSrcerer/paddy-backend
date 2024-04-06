@@ -12,9 +12,7 @@ import online.danielstefani.paddy.mqtt.RxMqttClient
 import online.danielstefani.paddy.power.PowerRepository
 import online.danielstefani.paddy.schedule.ScheduleRepository
 import online.danielstefani.paddy.user.UserRepository
-import online.danielstefani.paddy.util.toMono
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import reactor.core.publisher.Mono
 
 @ApplicationScoped
 class DaemonService(
@@ -81,21 +79,18 @@ class DaemonService(
 
     /*
     Reset (deletes all credentials in Daemon).
-    It also turns the device off.
+    It also turns the device off consequentially.
      */
     fun resetDaemon(username: String, daemonId: String): Daemon? {
         val daemon = daemonRepository.get(daemonId, username) ?: return null
 
-        val updateMono = Uni.createFrom().emitter { e ->
-            e.complete(daemonRepository.update(daemonId) { it.lastPing = -1 })
-        }.toMono()
+        mqtt.publish(daemonId, action = "reset", qos = MqttQos.EXACTLY_ONCE)
+            ?.blockingLast() ?: return null // Fail if failed to send reset message
 
-        val resetPublish = mqtt.publish(daemonId, action = "reset", qos = MqttQos.EXACTLY_ONCE)
-            ?.let { Mono.fromDirect(it) }
-
-        // Turn reset device then turn to recovery
-        resetPublish?.flatMap { updateMono }
-            ?.subscribe()
+        // There may be a race corner case in this situation
+        // where a ping is received after this update, and it prevents
+        // the device from entering recovery. To investigate.
+        daemonRepository.update(daemonId) { it.lastPing = -1 }
 
         return daemon
     }

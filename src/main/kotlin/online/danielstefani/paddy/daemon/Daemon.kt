@@ -25,6 +25,7 @@ open class Daemon() {
 
     var on: Boolean = false
 
+    // If this field is "-1" it means the Daemon is in recovery mode.
     var lastPing: Long = 0
 
     @JsonIgnore

@@ -12,8 +12,9 @@ import online.danielstefani.paddy.mqtt.RxMqttClient
 import online.danielstefani.paddy.power.PowerRepository
 import online.danielstefani.paddy.schedule.ScheduleRepository
 import online.danielstefani.paddy.user.UserRepository
+import online.danielstefani.paddy.util.toMono
 import org.eclipse.microprofile.rest.client.inject.RestClient
-import java.util.concurrent.TimeUnit
+import reactor.core.publisher.Mono
 
 @ApplicationScoped
 class DaemonService(
@@ -79,17 +80,22 @@ class DaemonService(
     }
 
     /*
-    Turn the daemon off and reset it (deletes all credentials in Daemon).
+    Reset (deletes all credentials in Daemon).
+    It also turns the device off.
      */
     fun resetDaemon(username: String, daemonId: String): Daemon? {
-        val daemon = daemonRepository.get(daemonId) ?: return null
+        val daemon = daemonRepository.get(daemonId, username) ?: return null
 
-        val offPublish = mqtt.publish(daemonId, action = "off", qos = MqttQos.EXACTLY_ONCE)
+        val updateMono = Uni.createFrom().emitter { e ->
+            e.complete(daemonRepository.update(daemonId) { it.lastPing = -1 })
+        }.toMono()
+
         val resetPublish = mqtt.publish(daemonId, action = "reset", qos = MqttQos.EXACTLY_ONCE)
-            ?.delay(500, TimeUnit.MILLISECONDS) // Delay is to make sure off is received before reset
+            ?.let { Mono.fromDirect(it) }
 
-        // Turn device off THEN reset it
-        offPublish?.concatWith(resetPublish)?.subscribe()
+        // Turn reset device then turn to recovery
+        resetPublish?.flatMap { updateMono }
+            ?.subscribe()
 
         return daemon
     }

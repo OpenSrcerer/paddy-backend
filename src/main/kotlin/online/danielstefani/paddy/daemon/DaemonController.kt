@@ -56,10 +56,8 @@ class DaemonController(
 
     @PATCH
     @Path("/{id}/recover")
-    fun recoverDaemon(
-        @NotNull @Valid daemon: Daemon
-    ): Uni<RestResponse<CreateDaemonResponse?>> {
-        return daemonService.createDaemon(securityIdentity.username(), daemon.id!!.toLong(), true)
+    fun recoverDaemon(@RestPath id: Long): Uni<RestResponse<CreateDaemonResponse?>> {
+        return daemonService.createDaemon(securityIdentity.username(), id, true)
             .map {
                 if (it != null) ResponseBuilder.ok(it).build()
                 else status(Response.Status.CONFLICT)

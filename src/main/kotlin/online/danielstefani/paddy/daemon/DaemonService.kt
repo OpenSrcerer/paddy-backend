@@ -40,7 +40,7 @@ class DaemonService(
         val daemon = daemonRepository.get("$daemonId", username)
 
         // If daemon already exists and is not in recovery mode, prevent conflicts
-        if (daemon?.recovery == true) return Uni.createFrom().nullItem()
+        if (daemon?.recovery == false) return Uni.createFrom().nullItem()
 
         val daemonUni: Uni<Daemon?> =
             if (daemon != null)

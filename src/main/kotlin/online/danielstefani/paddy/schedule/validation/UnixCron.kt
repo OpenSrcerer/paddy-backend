@@ -4,11 +4,11 @@ import jakarta.validation.Constraint
 import jakarta.validation.Payload
 import kotlin.reflect.KClass
 
-@Constraint(validatedBy = [QuartzCronValidator::class])
+@Constraint(validatedBy = [UnixCronValidator::class])
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class QuartzCron(
-    val message: String = "Field must be valid Quartz Cron expression",
+annotation class UnixCron(
+    val message: String = "Field must be valid Unix Cron expression",
 
     val groups: Array<KClass<*>> = [],
 

@@ -3,8 +3,8 @@ package online.danielstefani.paddy.schedule
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.validation.constraints.NotNull
 import online.danielstefani.paddy.daemon.Daemon
-import online.danielstefani.paddy.schedule.validation.QuartzCron
 import online.danielstefani.paddy.schedule.validation.Timezone
+import online.danielstefani.paddy.schedule.validation.UnixCron
 import online.danielstefani.paddy.schedule.validation.ValidSchedule
 import org.neo4j.ogm.annotation.GeneratedValue
 import org.neo4j.ogm.annotation.Id
@@ -32,7 +32,7 @@ open class Schedule {
     var single: Long? = null
 
     // Signifies that this Schedule will run periodically.
-    @QuartzCron
+    @UnixCron
     var periodic: String? = null
 
     // The next time this Schedule will be executed

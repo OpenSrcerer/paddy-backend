@@ -6,10 +6,10 @@ import com.cronutils.parser.CronParser
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
 
-class QuartzCronValidator : ConstraintValidator<QuartzCron, String> {
+class UnixCronValidator : ConstraintValidator<UnixCron, String> {
     companion object {
         private val cronParser = CronParser(
-            CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))
+            CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX))
     }
 
     override fun isValid(string: String?, ctx: ConstraintValidatorContext?): Boolean {

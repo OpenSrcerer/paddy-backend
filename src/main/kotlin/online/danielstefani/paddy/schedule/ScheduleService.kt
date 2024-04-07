@@ -16,7 +16,7 @@ class ScheduleService(
 ) {
     companion object {
         private val cronParser = CronParser(
-            CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))
+            CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX))
     }
 
     fun createSchedule(

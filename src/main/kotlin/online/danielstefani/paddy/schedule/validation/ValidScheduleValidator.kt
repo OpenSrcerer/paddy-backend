@@ -8,7 +8,7 @@ class ValidScheduleValidator : ConstraintValidator<ValidSchedule, Schedule> {
 
     override fun isValid(schedule: Schedule?, ctx: ConstraintValidatorContext?): Boolean {
         if (schedule == null) return false
-        if (schedule.single == null && schedule.periodic == null) return false
+        if (schedule.nextExecution == null && schedule.periodic == null) return false
 
         return true
     }

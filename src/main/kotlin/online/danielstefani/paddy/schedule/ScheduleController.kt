@@ -10,7 +10,8 @@ import online.danielstefani.paddy.mqtt.RxMqttClient
 import online.danielstefani.paddy.util.username
 import org.jboss.resteasy.reactive.RestPath
 import org.jboss.resteasy.reactive.RestResponse
-import org.jboss.resteasy.reactive.RestResponse.*
+import org.jboss.resteasy.reactive.RestResponse.notFound
+import org.jboss.resteasy.reactive.RestResponse.ok
 
 @Path("/daemon/{daemonId}/schedule")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -43,10 +44,6 @@ class ScheduleController(
         @RestPath daemonId: Long,
         @NotNull @Valid schedule: Schedule
     ): RestResponse<Schedule?> {
-        if (schedule.single == null && schedule.periodic == null) {
-            return status(Status.BAD_REQUEST)
-        }
-
         return scheduleService.createSchedule(daemonId.toString(), schedule)
             ?.let {
                 mqttClient.publish(it.id.toString())?.subscribe()
@@ -65,10 +62,10 @@ class ScheduleController(
         val updatedSchedule = scheduleRepository.update(id, daemonId.toString()) {
 
             it.type = (schedule.type ?: it.type)
-            it.single = (schedule.single ?: it.single)
             it.periodic = (schedule.periodic ?: it.periodic)
             it.finish = (schedule.finish ?: it.finish)
             it.timezone = (schedule.timezone ?: it.timezone)
+
         }?.also {
             mqttClient.publish(it.id.toString())?.subscribe()
         }

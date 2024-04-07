@@ -60,9 +60,10 @@ open class Schedule {
     fun secondsUntil() = nextExecution!! - Instant.now().epochSecond
 
     @JsonProperty
-    fun interval(): Long? = cronParser.parse(periodic)?.let { cron ->
+    fun interval(): Long? {
+        if (!isPeriodic()) return null
 
-        val exec = ExecutionTime.forCron(cron)
+        val exec = ExecutionTime.forCron(cronParser.parse(periodic))
         val zone = ZonedDateTime.now(ZoneId.of(timezone))
 
         return exec.timeFromLastExecution(zone)

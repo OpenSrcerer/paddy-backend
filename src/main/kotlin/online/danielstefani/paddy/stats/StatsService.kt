@@ -19,7 +19,7 @@ class StatsService(
                 // Formula for kWh is (powerKw * deltaTimeH)
                 // Time difference between the readings is already every hour
                 // So kWh = powerKw, and we accumulate for every reading
-                .fold(0F) { acc, pwr -> acc + pwr.averageW!! }
+                .fold(0.0) { acc, pwr -> acc + pwr.averageW!! }
 
             it.complete(TotalPower(totalKwh))
         }

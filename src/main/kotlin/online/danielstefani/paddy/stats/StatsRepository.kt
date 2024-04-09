@@ -32,7 +32,7 @@ class StatsRepository : AbstractNeo4jRepository() {
             .replace("?1", replacement)
             .replace("?2", if (limit == null) "" else "LIMIT $limit")
 
-        return session.query<AveragePower>(query)
+        return session.query<AveragePower>(query).reversed()
     }
 
 }

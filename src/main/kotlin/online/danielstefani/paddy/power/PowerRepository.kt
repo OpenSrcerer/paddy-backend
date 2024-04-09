@@ -19,49 +19,6 @@ class PowerRepository : AbstractNeo4jRepository() {
         return session.queryForObject<Power>(query)
     }
 
-    fun getAll(daemonId: String): List<Power> {
-        val query = """
-                    MATCH 
-                        (dx:Daemon { id: "$daemonId" })
-                            -[:DRAWS]->
-                        (px:Power)
-                    RETURN px
-                """
-
-        return session.query(query)
-    }
-
-    /*
-    Get all Power-s between two UNIX timestamps.
-    Both the timestamps are exclusive.
-    */
-    fun getAllBetween(
-        daemonId: String,
-        limit: Int = 10,
-        before: Long? = null,
-        after: Long? = null
-    ): List<Power> {
-        val replacement =
-            if (before != null && after != null) "WHERE px.timestamp > $after AND px.timestamp < $before"
-            else if (after != null) "WHERE px.timestamp > $after"
-            else if (before != null) "WHERE px.timestamp < $before"
-            else ""
-
-        val query = """
-                    MATCH
-                        (dx:Daemon { id: "$daemonId" })
-                            -[:DRAWS]->
-                        (px:Power)
-                        ?
-                    RETURN px
-                    ORDER BY px.timestamp DESC
-                    LIMIT $limit
-                """
-            .replace("?", replacement)
-
-        return session.query<Power>(query).reversed()
-    }
-
     fun create(
         daemon: Daemon,
         power: Power

@@ -2,7 +2,7 @@ package online.danielstefani.paddy.stats
 
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.repository.AbstractNeo4jRepository
-import online.danielstefani.paddy.stats.dto.AveragePowerEveryTemporal
+import online.danielstefani.paddy.stats.dto.AveragePower
 import online.danielstefani.paddy.stats.dto.PowerTemporal
 
 @ApplicationScoped
@@ -14,7 +14,7 @@ class StatsRepository : AbstractNeo4jRepository() {
         limit: Int? = 10,
         before: Long? = null,
         after: Long? = null
-    ): List<AveragePowerEveryTemporal> {
+    ): List<AveragePower> {
         val replacement =
             if (before != null && after != null) "WHERE time_cursor > $after AND time_cursor < $before"
             else if (after != null) "WHERE time_cursor > $after"
@@ -32,7 +32,7 @@ class StatsRepository : AbstractNeo4jRepository() {
             .replace("?1", replacement)
             .replace("?2", if (limit == null) "" else "LIMIT $limit")
 
-        return session.query<AveragePowerEveryTemporal>(query)
+        return session.query<AveragePower>(query)
     }
 
 }

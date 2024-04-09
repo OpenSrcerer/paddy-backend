@@ -4,7 +4,7 @@ import io.quarkus.security.Authenticated
 import io.smallrye.mutiny.Uni
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
-import online.danielstefani.paddy.stats.dto.AveragePowerEveryTemporal
+import online.danielstefani.paddy.stats.dto.AveragePower
 import online.danielstefani.paddy.stats.dto.PowerTemporal
 import online.danielstefani.paddy.stats.dto.TotalPower
 import org.jboss.resteasy.reactive.RestPath
@@ -27,7 +27,7 @@ class StatsController(
         @RestQuery @DefaultValue("10") limit: Int,
         @RestQuery before: Long? = null,
         @RestQuery after: Long? = null
-    ): Uni<List<AveragePowerEveryTemporal>> {
+    ): Uni<List<AveragePower>> {
         return Uni.createFrom().emitter {
             it.complete(statsRepository.getAveragePowerEveryTemporal(
                 daemonId, temporal, limit, before, after))

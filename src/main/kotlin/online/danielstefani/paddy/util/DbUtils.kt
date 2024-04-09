@@ -12,7 +12,7 @@ inline fun <reified T: Any> Result.get(): List<T> {
             emptyList<T>()
 
         this.asSequence().toList().flatMap<Map<String, Any>, T> { resMap ->
-            return if (resMap.size == 1)
+            if (resMap.size == 1)
                 resMap.values.map { it as T }
             else
                 listOf(objectMapper.convertValue(resMap, T::class.java))

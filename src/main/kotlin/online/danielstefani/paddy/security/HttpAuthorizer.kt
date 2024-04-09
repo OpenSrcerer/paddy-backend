@@ -47,6 +47,7 @@ class HttpAuthorizer(
             }
 
             // This is to protect users from accessing other user's daemons
+            // and making sure they can access a given Daemon
             return@flatMap if (path.startsWith("daemon"))
                 authorizeDaemonRoute(path, id)
             else

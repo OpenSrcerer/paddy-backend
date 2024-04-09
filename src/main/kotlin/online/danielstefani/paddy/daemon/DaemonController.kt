@@ -57,7 +57,7 @@ class DaemonController(
     @PATCH
     @Path("/{id}/reset")
     fun resetDaemon(@RestPath id: Long): RestResponse<Daemon> {
-        return daemonService.resetDaemon(securityIdentity.username(), id.toString())
+        return daemonService.resetDaemon(id.toString())
             ?.let { ok(it) }
             ?: status(Response.Status.NOT_FOUND)
     }
@@ -71,7 +71,7 @@ class DaemonController(
     @DELETE
     @Path("/{id}")
     fun deleteDaemon(@RestPath id: Long): RestResponse<Daemon> {
-        return daemonService.deleteDaemon(securityIdentity.username(), id.toString())
+        return daemonService.deleteDaemon(id.toString())
             ?.let { ok(it) }
             ?: status(Response.Status.NOT_FOUND)
     }

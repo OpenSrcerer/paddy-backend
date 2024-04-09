@@ -1,13 +1,11 @@
 package online.danielstefani.paddy.schedule
 
 import io.quarkus.security.Authenticated
-import io.quarkus.security.identity.SecurityIdentity
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotNull
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import online.danielstefani.paddy.mqtt.RxMqttClient
-import online.danielstefani.paddy.util.username
 import org.jboss.resteasy.reactive.RestPath
 import org.jboss.resteasy.reactive.RestResponse
 import org.jboss.resteasy.reactive.RestResponse.notFound
@@ -18,7 +16,6 @@ import org.jboss.resteasy.reactive.RestResponse.ok
 @Produces(MediaType.APPLICATION_JSON)
 @Authenticated
 class ScheduleController(
-    private val securityIdentity: SecurityIdentity,
     private val scheduleService: ScheduleService,
     private val scheduleRepository: ScheduleRepository,
     private val mqttClient: RxMqttClient
@@ -36,7 +33,7 @@ class ScheduleController(
 
     @GET
     fun getAllSchedules(@RestPath daemonId: String): List<Schedule> {
-        return scheduleRepository.getAll(daemonId, securityIdentity.username())
+        return scheduleRepository.getAll(daemonId)
     }
 
     @POST

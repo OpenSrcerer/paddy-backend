@@ -7,7 +7,7 @@ import online.danielstefani.paddy.user.User
 @ApplicationScoped
 class DaemonRepository : AbstractNeo4jRepository() {
 
-    fun get(id: String, username: String? = null): Daemon? {
+    fun get(id: String): Daemon? {
         val query = """
                     MATCH (node:Daemon { id: "$id" })
                     RETURN node

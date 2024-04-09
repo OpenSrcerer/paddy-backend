@@ -37,7 +37,7 @@ class DaemonService(
         daemonId: Long
     ): Uni<CreateDaemonResponse?> {
         val user = userRepository.get(username)
-        val daemon = daemonRepository.get("$daemonId", username)
+        val daemon = daemonRepository.get("$daemonId")
 
         // If daemon already exists and is not in recovery mode, prevent conflicts
         if (daemon?.recovery == false) return Uni.createFrom().nullItem()
@@ -53,17 +53,17 @@ class DaemonService(
         val jwtUni = paddyAuth.generateJwt(JwtRequestDto("$daemonId", JwtType.DAEMON))
 
         return Uni.combine().all().unis(daemonUni, jwtUni)
-            .with { daemon, jwtRes ->
-                if (daemon != null) CreateDaemonResponse(daemon, jwtRes.jwt)
+            .with { dx, jwtRes ->
+                if (dx != null) CreateDaemonResponse(dx, jwtRes.jwt)
                 else null
             }
     }
 
-    fun deleteDaemon(username: String, daemonId: String): Daemon? {
-        resetDaemon(username, daemonId) ?: return null
+    fun deleteDaemon(daemonId: String): Daemon? {
+        resetDaemon(daemonId) ?: return null
 
         // Get schedules first
-        val schedules = scheduleRepository.getAll(username, daemonId)
+        val schedules = scheduleRepository.getAll(daemonId)
 
         // Delete all related entites from DB
         scheduleRepository.deleteAll(daemonId)
@@ -82,8 +82,8 @@ class DaemonService(
     Reset (deletes all credentials in Daemon).
     It also turns the device off consequentially.
      */
-    fun resetDaemon(username: String, daemonId: String): Daemon? {
-        val daemon = daemonRepository.get(daemonId, username) ?: return null
+    fun resetDaemon(daemonId: String): Daemon? {
+        val daemon = daemonRepository.get(daemonId) ?: return null
 
         mqtt.publish(daemonId, action = "reset", qos = MqttQos.EXACTLY_ONCE)
             ?.blockingLast() ?: return null // Fail if failed to send reset message

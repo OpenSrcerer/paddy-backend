@@ -19,11 +19,9 @@ class ScheduleRepository : AbstractNeo4jRepository() {
         return session.queryForObject<Schedule>(query)
     }
 
-    fun getAll(daemonId: String, username: String): List<Schedule> {
+    fun getAll(daemonId: String): List<Schedule> {
         val query = """
                     MATCH 
-                        (ux:User { username: "$username" })
-                            -[:OWNS]->
                         (dx:Daemon { id: "$daemonId" })
                             -[:IS_SCHEDULED]->
                         (sx:Schedule)

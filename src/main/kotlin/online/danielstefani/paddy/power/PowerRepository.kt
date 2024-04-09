@@ -19,11 +19,9 @@ class PowerRepository : AbstractNeo4jRepository() {
         return session.queryForObject<Power>(query)
     }
 
-    fun getAll(daemonId: String, username: String): List<Power> {
+    fun getAll(daemonId: String): List<Power> {
         val query = """
                     MATCH 
-                        (ux:User { username: "$username" })
-                            -[:OWNS]->
                         (dx:Daemon { id: "$daemonId" })
                             -[:DRAWS]->
                         (px:Power)
@@ -39,7 +37,6 @@ class PowerRepository : AbstractNeo4jRepository() {
     */
     fun getAllBetween(
         daemonId: String,
-        username: String,
         limit: Int = 10,
         before: Long? = null,
         after: Long? = null
@@ -51,9 +48,7 @@ class PowerRepository : AbstractNeo4jRepository() {
             else ""
 
         val query = """
-                    MATCH 
-                        (ux:User { username: "$username" })
-                            -[:OWNS]->
+                    MATCH
                         (dx:Daemon { id: "$daemonId" })
                             -[:DRAWS]->
                         (px:Power)

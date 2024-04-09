@@ -1,10 +1,8 @@
 package online.danielstefani.paddy.power
 
 import io.quarkus.security.Authenticated
-import io.quarkus.security.identity.SecurityIdentity
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
-import online.danielstefani.paddy.util.username
 import org.jboss.resteasy.reactive.RestPath
 import org.jboss.resteasy.reactive.RestQuery
 
@@ -13,8 +11,7 @@ import org.jboss.resteasy.reactive.RestQuery
 @Produces(MediaType.APPLICATION_JSON)
 @Authenticated
 class PowerController(
-    private val powerRepository: PowerRepository,
-    private val securityIdentity: SecurityIdentity
+    private val powerRepository: PowerRepository
 ) {
     @GET
     fun getAllPowers(
@@ -23,7 +20,6 @@ class PowerController(
         @RestQuery before: Long? = null,
         @RestQuery after: Long? = null
     ): List<Power> {
-        return powerRepository.getAllBetween(
-            daemonId, securityIdentity.username(), limit, before, after)
+        return powerRepository.getAllBetween(daemonId, limit, before, after)
     }
 }

@@ -2,18 +2,27 @@ package online.danielstefani.paddy.stats
 
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
-import online.danielstefani.paddy.power.PowerRepository
 import online.danielstefani.paddy.stats.dto.PowerTemporal
 import online.danielstefani.paddy.stats.dto.TotalPower
 
 @ApplicationScoped
 class StatsService(
-    private val powerRepository: PowerRepository,
     private val statsRepository: StatsRepository
 ) {
-    fun getTotalPower(daemonId: String): Uni<TotalPower> {
+
+    /*
+    This data is crunched with the average power measured every hour.
+    The before & after limiters can be used to find out how much power
+    the device has measured relative to two timestamps (ex. for 1 month, 1 year)
+     */
+    fun getTotalPower(
+        daemonId: String,
+        before: Long? = null,
+        after: Long? = null
+    ): Uni<TotalPower> {
         return Uni.createFrom().emitter {
-            val totalKwh = statsRepository.getAveragePowerEveryTemporal(daemonId, PowerTemporal.HOUR, null)
+            val totalKwh = statsRepository.getAveragePowerEveryTemporal(
+                daemonId, PowerTemporal.HOUR, null, before = before, after = after)
                 // Turn all measurements to kW
                 .onEach { pwr -> pwr.averageW = pwr.averageW?.div(1000) }
                 // Formula for kWh is (powerKw * deltaTimeH)

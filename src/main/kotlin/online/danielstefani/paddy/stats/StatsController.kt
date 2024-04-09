@@ -37,9 +37,11 @@ class StatsController(
     @GET
     @Path("/total")
     fun getTotalPower(
-        @RestPath daemonId: String
+        @RestPath daemonId: String,
+        @RestQuery before: Long? = null,
+        @RestQuery after: Long? = null
     ): Uni<TotalPower> {
-        return statsService.getTotalPower(daemonId)
+        return statsService.getTotalPower(daemonId, before, after)
     }
 
 }

@@ -16,9 +16,9 @@ class StatsRepository : AbstractNeo4jRepository() {
         after: Long? = null
     ): List<AveragePower> {
         val replacement =
-            if (before != null && after != null) "WHERE time_cursor > $after AND time_cursor < $before"
-            else if (after != null) "WHERE time_cursor > $after"
-            else if (before != null) "WHERE time_cursor < $before"
+            if (before != null && after != null) "WHERE px.timestamp > $after AND px.timestamp < $before"
+            else if (after != null) "WHERE px.timestamp > $after"
+            else if (before != null) "WHERE px.timestamp < $before"
             else ""
 
         val query = """

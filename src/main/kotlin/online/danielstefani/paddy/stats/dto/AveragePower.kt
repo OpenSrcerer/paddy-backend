@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 
 class AveragePower {
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
-    var averageW: Double? = null
+    var statistic: Double? = null
 
     var temporal: Long? = null
 }

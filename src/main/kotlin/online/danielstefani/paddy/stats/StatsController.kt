@@ -6,7 +6,6 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import online.danielstefani.paddy.stats.dto.AveragePower
 import online.danielstefani.paddy.stats.dto.PowerTemporal
-import online.danielstefani.paddy.stats.dto.TotalPower
 import org.jboss.resteasy.reactive.RestPath
 import org.jboss.resteasy.reactive.RestQuery
 
@@ -40,8 +39,19 @@ class StatsController(
         @RestPath daemonId: String,
         @RestQuery before: Long? = null,
         @RestQuery after: Long? = null
-    ): Uni<TotalPower> {
+    ): Uni<AveragePower> {
         return statsService.getTotalPower(daemonId, before, after)
     }
 
+    @GET
+    @Path("/rolling")
+    fun getRollingAverage(
+        @RestPath daemonId: String,
+        @RestQuery @DefaultValue("MINUTE") temporal: PowerTemporal,
+        @RestQuery @DefaultValue("10") limit: Int,
+        @RestQuery before: Long? = null,
+        @RestQuery after: Long? = null
+    ): Uni<List<AveragePower>> {
+        return statsService.getRollingPower(daemonId, temporal, limit, before, after)
+    }
 }

@@ -25,7 +25,7 @@ class StatsRepository : AbstractNeo4jRepository() {
                     MATCH (dx:Daemon { id: "$daemonId" }) -[:DRAWS]-> (px:Power)
                     ?1
                     WITH px.timestamp / $temporal AS time_cursor, px.w AS w
-                    RETURN time_cursor * $temporal AS temporal, avg(w) AS averageW
+                    RETURN time_cursor * $temporal AS temporal, avg(w) AS statistic
                     ORDER BY temporal DESC
                     ?2
                 """

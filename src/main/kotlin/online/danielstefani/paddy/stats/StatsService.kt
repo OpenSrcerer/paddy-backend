@@ -42,7 +42,7 @@ class StatsService(
         after: Long? = null
     ): Uni<List<AveragePower>> {
         return Uni.createFrom().emitter {
-            statsRepository.getAveragePowerEveryTemporal(
+            val temporalRollingKwh = statsRepository.getAveragePowerEveryTemporal(
                 daemonId, temporal, limit, before = before, after = after)
                 // Turn all measurements to kW
                 .onEach { pwr ->
@@ -50,6 +50,8 @@ class StatsService(
                     // formula by changing our measurements to hours if necessary
                     pwr.statistic = (pwr.statistic?.div(1000))?.times(temporal.toHours())
                 }
+
+            it.complete(temporalRollingKwh)
         }
     }
 }

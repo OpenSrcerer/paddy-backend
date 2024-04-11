@@ -4,7 +4,7 @@ import io.quarkus.security.Authenticated
 import io.smallrye.mutiny.Uni
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
-import online.danielstefani.paddy.stats.dto.AveragePower
+import online.danielstefani.paddy.stats.dto.PowerStatistic
 import online.danielstefani.paddy.stats.dto.PowerTemporal
 import org.jboss.resteasy.reactive.RestPath
 import org.jboss.resteasy.reactive.RestQuery
@@ -26,9 +26,9 @@ class StatsController(
         @RestQuery @DefaultValue("10") limit: Int,
         @RestQuery before: Long? = null,
         @RestQuery after: Long? = null
-    ): Uni<List<AveragePower>> {
+    ): Uni<List<PowerStatistic>> {
         return Uni.createFrom().emitter {
-            it.complete(statsRepository.getAveragePowerEveryTemporal(
+            it.complete(statsRepository.getAveragePowerUsage(
                 daemonId, temporal, limit, before, after))
         }
     }
@@ -39,7 +39,7 @@ class StatsController(
         @RestPath daemonId: String,
         @RestQuery before: Long? = null,
         @RestQuery after: Long? = null
-    ): Uni<AveragePower> {
+    ): Uni<PowerStatistic> {
         return statsService.getTotalPower(daemonId, before, after)
     }
 
@@ -51,7 +51,7 @@ class StatsController(
         @RestQuery @DefaultValue("10") limit: Int,
         @RestQuery before: Long? = null,
         @RestQuery after: Long? = null
-    ): Uni<List<AveragePower>> {
+    ): Uni<List<PowerStatistic>> {
         return statsService.getRollingPower(daemonId, temporal, limit, before, after)
     }
 }

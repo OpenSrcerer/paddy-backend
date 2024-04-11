@@ -2,7 +2,7 @@ package online.danielstefani.paddy.stats.dto
 
 import com.fasterxml.jackson.annotation.JsonFormat
 
-class AveragePower {
+class PowerStatistic {
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     var statistic: Double? = null
 

@@ -2,7 +2,7 @@ package online.danielstefani.paddy.stats
 
 import io.smallrye.mutiny.Uni
 import jakarta.enterprise.context.ApplicationScoped
-import online.danielstefani.paddy.stats.dto.AveragePower
+import online.danielstefani.paddy.stats.dto.PowerStatistic
 import online.danielstefani.paddy.stats.dto.PowerTemporal
 
 @ApplicationScoped
@@ -19,18 +19,17 @@ class StatsService(
         daemonId: String,
         before: Long? = null,
         after: Long? = null
-    ): Uni<AveragePower> {
+    ): Uni<PowerStatistic> {
         return Uni.createFrom().emitter { emitter ->
-            val totalKwh = statsRepository.getAveragePowerEveryTemporal(
-                daemonId, PowerTemporal.HOUR, null, before = before, after = after)
-                // Turn all measurements to kW
-                .onEach { pwr -> pwr.statistic = pwr.statistic?.div(1000) }
-                // Formula for kWh is (powerKw * deltaTimeH)
-                // Time difference between the readings is already every hour
-                // So kWh = powerKw, and we accumulate for every reading
+            val totalKwh = statsRepository.getCumulativePowerUsage(
+                daemonId, PowerTemporal.YEAR, null, before = before, after = after)
+                // The query here already returns power in Watt-Hours per year
+                // Accumulate every year
                 .fold(0.0) { acc, pwr -> acc + pwr.statistic!! }
+                // Turn all measurements to kWh
+                .div(1000)
 
-            emitter.complete(AveragePower().also { it.statistic = totalKwh })
+            emitter.complete(PowerStatistic().also { it.statistic = totalKwh })
         }
     }
 
@@ -40,16 +39,13 @@ class StatsService(
         limit: Int? = 10,
         before: Long? = null,
         after: Long? = null
-    ): Uni<List<AveragePower>> {
+    ): Uni<List<PowerStatistic>> {
         return Uni.createFrom().emitter {
-            val temporalRollingKwh = statsRepository.getAveragePowerEveryTemporal(
+
+            val temporalRollingKwh = statsRepository.getCumulativePowerUsage(
                 daemonId, temporal, limit, before = before, after = after)
-                // Turn all measurements to kW
-                .onEach { pwr ->
-                    // Now we need to comply with the kWh = (kiloWatts × hrs)
-                    // formula by changing our measurements to hours if necessary
-                    pwr.statistic = (pwr.statistic?.div(1000))?.times(temporal.toHours())
-                }
+                // Turn all measurements to kWh
+                .onEach { pwr -> pwr.statistic = pwr.statistic?.div(1000) }
 
             it.complete(temporalRollingKwh)
         }

@@ -31,20 +31,33 @@ class StatsRepository : AbstractNeo4jRepository() {
                     // ---- Step 2: Order all power measurements in an iterator to calculate delta time ----
                     WITH COLLECT(px) AS powerReadings
                     UNWIND range(0, size(powerReadings) - 2) AS i
-                    WITH powerReadings[i] AS currentPower, powerReadings[i + 1] AS nextPower
+                    WITH powerReadings, powerReadings[i] AS currentPower, powerReadings[i + 1] AS nextPower
                     ORDER BY currentPower.timestamp
                     
                     // ---- Step 3: Get delta time ----
-                    WITH currentPower, nextPower,
+                    WITH 
+                        powerReadings,
+                        currentPower, 
+                        nextPower,
                         nextPower.timestamp - currentPower.timestamp AS timeDeltaSeconds,
                         currentPower.w AS w
-                        WHERE (timeDeltaSeconds < 100)
+                    WHERE (timeDeltaSeconds < 100)
                         
                     // ---- Step 4: Calculate power usage in Watt-Seconds ----
-                    WITH nextPower.timestamp / $temporal AS time_cursor, timeDeltaSeconds * w AS Ws
+                    WITH 
+                        powerReadings, 
+                        nextPower.timestamp / $temporal AS time_cursor,
+                        timeDeltaSeconds * w AS Ws
                     
                     // ---- Final Step: Return Watt-Hours aggregated by temporal ----
-                    RETURN time_cursor * $temporal AS temporal, sum(Ws / 3600) AS statistic
+                    WITH 
+                        time_cursor * $temporal AS temporal,
+                        sum(Ws / 3600) AS statistic,
+                        powerReadings[0].timestamp AS eldestTimestamp
+                    RETURN CASE
+                        WHEN temporal < eldestTimestamp THEN eldestTimestamp 
+                        ELSE temporal 
+                    END AS temporal, statistic
                     ORDER BY temporal DESC
                     ?2
                 """

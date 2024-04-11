@@ -41,7 +41,7 @@ class StatsRepository : AbstractNeo4jRepository() {
                         WHERE (timeDeltaSeconds < 100)
                         
                     // ---- Step 4: Calculate power usage in Watt-Seconds ----
-                    WITH nextReading.timestamp / $temporal AS time_cursor, timeDeltaSeconds * w AS Ws
+                    WITH nextPower.timestamp / $temporal AS time_cursor, timeDeltaSeconds * w AS Ws
                     
                     // ---- Final Step: Return Watt-Hours aggregated by temporal ----
                     RETURN time_cursor * $temporal AS temporal, sum(Ws / 3600) AS statistic

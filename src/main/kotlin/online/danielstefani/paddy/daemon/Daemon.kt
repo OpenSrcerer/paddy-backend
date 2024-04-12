@@ -17,6 +17,7 @@ open class Daemon() {
     constructor(daemon: Daemon) : this() {
         this.id = daemon.id
         this.user = daemon.user
+        this.lastRssi = daemon.lastRssi
         this.lastPing = daemon.lastPing
     }
 
@@ -24,6 +25,9 @@ open class Daemon() {
     var id: String? = null
 
     var on: Boolean = false
+
+    // Wi-Fi Signal Strength
+    var lastRssi: Int? = null
 
     var lastPing: Long = 0
 

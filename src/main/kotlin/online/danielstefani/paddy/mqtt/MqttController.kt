@@ -36,6 +36,7 @@ class MqttController(
 
         daemonRepository.update(daemonId) {
             it.recovery = false
+            it.lastRssi = body?.toInt()
             it.lastPing = Instant.now().epochSecond
         }
 

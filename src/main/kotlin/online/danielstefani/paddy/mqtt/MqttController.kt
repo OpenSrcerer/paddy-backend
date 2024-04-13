@@ -2,6 +2,7 @@ package online.danielstefani.paddy.mqtt
 
 import com.hivemq.client.mqtt.datatypes.MqttQos
 import io.quarkus.logging.Log
+import io.quarkus.runtime.annotations.RegisterForReflection
 import jakarta.enterprise.context.ApplicationScoped
 import online.danielstefani.paddy.daemon.DaemonRepository
 import online.danielstefani.paddy.daemon.DaemonService
@@ -10,6 +11,7 @@ import online.danielstefani.paddy.power.PowerRepository
 import java.time.Instant
 
 @ApplicationScoped
+@RegisterForReflection
 class MqttController(
     private val mqtt: RxMqttClient,
     private val daemonService: DaemonService,

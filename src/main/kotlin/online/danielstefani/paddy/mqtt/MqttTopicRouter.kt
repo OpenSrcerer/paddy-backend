@@ -3,6 +3,7 @@ package online.danielstefani.paddy.mqtt
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish
 import io.quarkus.logging.Log
 import io.quarkus.runtime.StartupEvent
+import io.quarkus.runtime.annotations.RegisterForReflection
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.enterprise.context.control.ActivateRequestContext
 import jakarta.enterprise.event.Observes
@@ -16,6 +17,7 @@ daemon/{id}/v1/reads/ACTION
 The point of this class is to extract ACTION and route it to the proper handler.
  */
 @ApplicationScoped
+@RegisterForReflection
 class MqttTopicRouter(
     private val mqttController: MqttController
 ) {

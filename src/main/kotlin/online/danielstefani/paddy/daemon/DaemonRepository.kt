@@ -43,6 +43,7 @@ class DaemonRepository : AbstractNeo4jRepository() {
 
         return Daemon().also {
             it.id = id
+            it.name = "D-$id"
             it.user = user
 
             session().save(it)

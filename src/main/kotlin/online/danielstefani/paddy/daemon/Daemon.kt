@@ -24,6 +24,8 @@ open class Daemon() {
     @Id @NotNull @Pattern(regexp = "\\d+")
     var id: String? = null
 
+    var name: String? = null
+
     var on: Boolean = false
 
     // Wi-Fi Signal Strength

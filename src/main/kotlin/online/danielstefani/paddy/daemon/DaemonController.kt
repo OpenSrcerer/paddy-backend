@@ -19,6 +19,7 @@ import org.jboss.resteasy.reactive.RestResponse.*
 @Produces(MediaType.APPLICATION_JSON)
 @Authenticated
 class DaemonController(
+    private val daemonRepository: DaemonRepository,
     private val daemonService: DaemonService,
     private val securityIdentity: SecurityIdentity
 ) {
@@ -48,6 +49,28 @@ class DaemonController(
     }
 
     @PATCH
+    @Path("/{id}")
+    fun patchDaemon(
+        @RestPath id: Long,
+        @NotNull daemon: Daemon
+    ): RestResponse<Daemon> {
+        if (
+            daemon.name.isNullOrBlank() ||
+            daemon.name!!.length < 2 ||
+            daemon.name!!.length > 10
+        ) {
+            return status(Response.Status.BAD_REQUEST)
+        }
+
+        val updatedDaemon = daemonRepository.update("$id") {
+            it.name = daemon.name
+        }
+
+        return if (updatedDaemon != null) ok(updatedDaemon)
+        else notFound()
+    }
+
+    @PATCH
     @Path("/{id}/toggle")
     fun toggleDaemon(@RestPath id: Long): RestResponse<Unit> {
         return if (daemonService.toggleDaemon(id.toString())) ok()
@@ -60,12 +83,6 @@ class DaemonController(
         return daemonService.resetDaemon(id.toString())
             ?.let { ok(it) }
             ?: status(Response.Status.NOT_FOUND)
-    }
-
-    @PATCH
-    @Path("/{id}")
-    fun patchDaemon(@RestPath id: Long): String {
-        return ":) Not Implemented Yet"
     }
 
     @DELETE

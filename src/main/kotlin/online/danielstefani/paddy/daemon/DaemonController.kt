@@ -57,7 +57,7 @@ class DaemonController(
         if (
             daemon.name.isNullOrBlank() ||
             daemon.name!!.length < 2 ||
-            daemon.name!!.length > 10
+            daemon.name!!.length > 15
         ) {
             return status(Response.Status.BAD_REQUEST)
         }

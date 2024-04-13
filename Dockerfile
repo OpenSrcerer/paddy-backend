@@ -1,53 +1,25 @@
-FROM gradle:8.4.0-jdk17-jammy AS BUILD
+FROM ghcr.io/graalvm/graalvm-ce:ol8-java17-22.3.3 AS BUILD
 
 WORKDIR /appbuild
 
 COPY . .
 
-RUN gradle build -Dquarkus.package.type=uber-jar --no-daemon
+RUN gu install native-image
 
-#FROM amazoncorretto:17-alpine as CORRETTO-DEPS
-#
-#WORKDIR /app
-#
-#COPY --from=build /appbuild/build/paddy-backend-runner.jar .
-#
-## Get modules list
-#RUN unzip paddy-backend-runner.jar -d temp &&  \
-#    jdeps  \
-#      --print-module-deps \
-#      --ignore-missing-deps \
-#      --recursive \
-#      --multi-release 17 \
-#      --class-path="./temp/BOOT-INF/lib/*" \
-#      --module-path="./temp/BOOT-INF/lib/*" \
-#      paddy-backend-runner.jar > modules.txt
-#
-#FROM amazoncorretto:17-alpine as CORRETTO-JDK
-#
-#WORKDIR /app
-#
-#COPY --from=corretto-deps /app/modules.txt .
-#
-## Output a custom jre built from the modules list
-#RUN apk add --no-cache binutils && \
-#    jlink \
-#     --verbose \
-#     --add-modules "$(cat modules.txt)" \
-#     --strip-debug \
-#     --no-man-pages \
-#     --no-header-files \
-#     --compress=2 \
-#     --output /jre
+RUN ./gradlew build --no-daemon -Dquarkus.package.type=native
 
-FROM amazoncorretto:17-alpine as CORRETTO-JDK
 
-#COPY --from=corretto-jdk /jre /app/jre
-COPY --from=build /appbuild/build/paddy-backend-runner.jar /app/paddy-backend-runner.jar
+FROM quay.io/quarkus/quarkus-micro-image:2.0 AS NATIVE
 
-WORKDIR /app
+WORKDIR /work
 
-ARG DEBUG_OPT
-ENV DEBUG_API_OPT=$DEBUG_OPT
+COPY --from=BUILD /appbuild/* .
 
-CMD java $DEBUG_API_OPT -jar paddy-backend-runner.jar
+RUN chown 1001 /work \
+    && chmod "g+rwX" /work \
+    && chown 1001:root /work
+
+EXPOSE 8080
+USER 1001
+
+CMD ["/work/quarkus-build/gen/paddy-backend-runner", "-Dquarkus.http.host=0.0.0.0"]

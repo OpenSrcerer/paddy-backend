@@ -32,14 +32,14 @@ class PowerRepository : AbstractNeo4jRepository() {
 
     fun deleteAll(daemonId: String) {
         val query = """
-                    :auto MATCH
+                    MATCH
                         (dx:Daemon { id: "$daemonId" })
                             -[:DRAWS]->
                         (px:Power)
                     CALL { WITH px DETACH DELETE px } IN TRANSACTIONS
                 """
 
-        session.query<Power>(query)
+        session.queryWithTransaction<Power>(query)
     }
 
     fun deleteAllBefore(

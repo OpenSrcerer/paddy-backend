@@ -6,12 +6,23 @@ import jakarta.enterprise.context.RequestScoped
 import online.danielstefani.paddy.util.get
 import org.neo4j.ogm.session.Session
 import org.neo4j.ogm.session.queryForObject
+import org.neo4j.ogm.transaction.Transaction
 
 @RequestScoped
 class RequestScopedNeo4jSession(
     private val sessionFactory: Neo4jSessionFactory
 ) {
     private var session: Session? = null
+
+    inline fun <reified T : Any> queryWithTransaction(query: String): List<T> {
+        return getSession().beginTransaction(Transaction.Type.READ_WRITE).use { tx ->
+            val results = query<T>(query)
+
+            tx.commit()
+
+            results
+        }
+    }
 
     inline fun <reified T : Any> queryForObject(query: String): T? {
         Log.info("[neo4j->session] <$query>")

@@ -36,7 +36,7 @@ class PowerRepository : AbstractNeo4jRepository() {
                         (dx:Daemon { id: "$daemonId" })
                             -[:DRAWS]->
                         (px:Power)
-                    DETACH DELETE px
+                    CALL { WITH px DETACH DELETE px } IN TRANSACTIONS
                 """
 
         session.query<Power>(query)

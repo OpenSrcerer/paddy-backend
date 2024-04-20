@@ -43,7 +43,7 @@ class PowerRepository : AbstractNeo4jRepository() {
                     RETURN batches, total
                 """
 
-        session.query<Power>(query)
+        session.query<Unit>(query)
     }
 
     fun deleteAllBefore(

@@ -6,6 +6,8 @@ import org.neo4j.ogm.model.Result
 val objectMapper = ObjectMapper()
 
 inline fun <reified T: Any> Result.get(): List<T> {
+    if (T::class.equals(Unit))
+        return emptyList()
 
     return with(this.queryResults().iterator()) {
         if (!this.hasNext())

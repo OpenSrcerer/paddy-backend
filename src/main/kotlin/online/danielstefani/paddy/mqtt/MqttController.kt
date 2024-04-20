@@ -24,6 +24,9 @@ class MqttController(
 
         val daemon = daemonRepository.get(daemonId) ?: return
 
+        // To prevent powers from being created while daemon is being deleted
+        if (daemon.recovery) return
+
         val power = Power().also {
             it.w = body?.toFloat() ?: return
             it.timestamp = timestamp

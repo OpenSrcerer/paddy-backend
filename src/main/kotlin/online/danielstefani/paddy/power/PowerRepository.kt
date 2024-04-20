@@ -34,7 +34,7 @@ class PowerRepository : AbstractNeo4jRepository() {
         val query = """
                     CALL apoc.periodic.iterate(
                         "MATCH
-                            (dx:Daemon { id: "$daemonId" })
+                            (dx:Daemon { id: \"$daemonId\" })
                                 -[:DRAWS]->
                             (px:Power) RETURN id(px) AS id",
                         "MATCH (px) WHERE id(px) = id DETACH DELETE px",

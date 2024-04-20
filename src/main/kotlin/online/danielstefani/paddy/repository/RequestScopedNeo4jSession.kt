@@ -16,11 +16,17 @@ class RequestScopedNeo4jSession(
 
     inline fun <reified T : Any> queryWithTransaction(query: String): List<T> {
         return getSession().beginTransaction(Transaction.Type.READ_WRITE).use { tx ->
-            val results = query<T>(query)
-
-            tx.commit()
-
-            results
+            try {
+                val results = query<T>(query)
+                tx.commit()
+                results
+            } catch (ex: Exception) {
+                Log.error("[neo4j->session] Failed to execute transaction!", ex)
+                tx.rollback()
+                emptyList()
+            } finally {
+                tx.close()
+            }
         }
     }
 

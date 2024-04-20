@@ -32,14 +32,18 @@ class PowerRepository : AbstractNeo4jRepository() {
 
     fun deleteAll(daemonId: String) {
         val query = """
-                    MATCH
-                        (dx:Daemon { id: "$daemonId" })
-                            -[:DRAWS]->
-                        (px:Power)
-                    CALL { WITH px DETACH DELETE px } IN TRANSACTIONS
+                    CALL apoc.periodic.iterate(
+                        "MATCH
+                            (dx:Daemon { id: "$daemonId" })
+                                -[:DRAWS]->
+                            (px:Power) RETURN id(px) AS id",
+                        "MATCH (px) WHERE id(px) = id DETACH DELETE px",
+                        { batchSize:10000 })
+                    YIELD batches, total
+                    RETURN batches, total
                 """
 
-        session.queryWithTransaction<Power>(query)
+        session.query<Power>(query)
     }
 
     fun deleteAllBefore(
